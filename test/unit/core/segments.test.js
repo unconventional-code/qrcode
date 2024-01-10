@@ -4,6 +4,7 @@ const Segments = require('core/segments')
 const NumericData = require('core/numeric-data')
 const AlphanumericData = require('core/alphanumeric-data')
 const ByteData = require('core/byte-data')
+const StructuredAppendData = require('core/structured-append-data')
 const toSJIS = require('helper/to-sjis')
 const Utils = require('core/utils')
 
@@ -199,6 +200,11 @@ test('Segments from array', function (t) {
 test('Segments optimization', function (t) {
   t.deepEqual(Segments.fromString('乂ЁЖ', 1), Segments.fromArray([{ data: '乂ЁЖ', mode: 'byte' }]),
     'Should use Byte mode if Kanji support is disabled')
+
+  t.deepEqual(Segments.fromArray(
+    [{ data: { position: 0x1, total: 0x3, parity: 0x0A }, mode: 'structuredappend' }]),
+    [new StructuredAppendData({ position: 0x1, total: 0x3, parity: 0x0A })],
+    'Should use Structured Append mode')
 
   Utils.setToSJISFunction(toSJIS)
   testData.forEach(function (data) {
