@@ -129,7 +129,7 @@ test('To string', function (t) {
   t.equal(Mode.toString(Mode.ALPHANUMERIC), 'Alphanumeric')
   t.equal(Mode.toString(Mode.BYTE), 'Byte')
   t.equal(Mode.toString(Mode.KANJI), 'Kanji')
-  t.equal(Mode.toString(Mode.STRUCTURED_APPEND), 'StructuredAppend')
+  t.equal(Mode.toString(Mode.STRUCTURED_APPEND), 'Structured Append')
 
   t.throw(function () { Mode.toString({}) }, 'Should throw if mode is invalid')
 
