@@ -18,6 +18,6 @@ export default [{
   plugins: [commonjs(), resolve(), babel(babelConfig), terser()]
 }, {
   input: 'lib/browser.js',
-  output: { file: 'dist/qrcode.esm.js', format: 'esm', name: 'QRCode', exports: 'named' },
+  output: { file: 'build/qrcode.esm.js', format: 'esm', name: 'QRCode', exports: 'named' },
   plugins: [commonjs(), resolve(), babel(babelConfig), terser()]
 }]
