@@ -1,4 +1,4 @@
-import pattern from '../../../lib/core/finder-pattern';
+import * as pattern from '../../../lib/core/finder-pattern';
 
 describe('Finder pattern', () => {
 	it('should always return 3 pattern positions', () => {
