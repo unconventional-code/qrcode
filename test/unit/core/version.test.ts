@@ -1,5 +1,5 @@
 import Version from '../../../lib/core/version';
-import VersionCheck from '../../../lib/core/version-check';
+import * as VersionCheck from '../../../lib/core/version-check';
 import * as ECLevel from '../../../lib/core/error-correction-level';
 import Mode from '../../../lib/core/mode';
 import NumericData from '../../../lib/core/numeric-data';
