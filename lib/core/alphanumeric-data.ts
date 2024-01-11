@@ -29,6 +29,10 @@ export default class AlphanumericData {
 		return 11 * Math.floor(this.data.length / 2) + 6 * (this.data.length % 2);
 	}
 
+	static getBitsLength(length: number) {
+		return 11 * Math.floor(length / 2) + 6 * (length % 2);
+	}
+
 	getLength() {
 		return this.data.length;
 	}

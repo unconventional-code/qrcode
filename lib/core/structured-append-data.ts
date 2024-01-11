@@ -13,6 +13,10 @@ export default class StructuredAppendData {
 		return 16;
 	}
 
+	static getBitsLength() {
+		return 16;
+	}
+
 	getLength() {
 		return 0;
 	}

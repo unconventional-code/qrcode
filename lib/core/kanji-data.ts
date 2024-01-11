@@ -14,6 +14,10 @@ export default class KanjiData {
 		return this.data.length * 13;
 	}
 
+	static getBitsLength(length: number) {
+		return length * 13;
+	}
+
 	getLength() {
 		return this.data.length;
 	}

@@ -16,6 +16,10 @@ export default class NumericData {
 		);
 	}
 
+	static getBitsLength(length: number) {
+		return 10 * Math.floor(length / 3) + (length % 3 ? (length % 3) * 3 + 1 : 0);
+	}
+
 	getLength() {
 		return this.data.length;
 	}

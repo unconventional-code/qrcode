@@ -17,6 +17,10 @@ export default class ByteData {
 		return this.data.length * 8;
 	}
 
+	static getBitsLength(length: number) {
+		return length * 8;
+	}
+
 	getLength() {
 		return this.data.length;
 	}
