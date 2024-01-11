@@ -1,4 +1,4 @@
-import Poly from '../../../lib/core/polynomial';
+import * as Poly from '../../../lib/core/polynomial';
 
 describe('Generator polynomial', () => {
 	const result = Poly.generateECPolynomial(0);
