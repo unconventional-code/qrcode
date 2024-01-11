@@ -215,31 +215,6 @@ export interface QRCode {
 
 export type GeneratedQRCodeSegment = NumericData | AlphanumericData | ByteData | KanjiData;
 
-export interface DataSegment {
-	getLength(): number;
-	getBitsLength(): number;
-}
-
-export interface NumericData extends DataSegment {
-	mode: Mode<'Numeric'>;
-	data: string;
-}
-
-export interface AlphanumericData extends DataSegment {
-	mode: Mode<'Alphanumeric'>;
-	data: string;
-}
-
-export interface ByteData extends DataSegment {
-	mode: Mode<'Byte'>;
-	data: Uint8Array;
-}
-
-export interface KanjiData extends DataSegment {
-	mode: Mode<'Kanji'>;
-	data: string;
-}
-
 /**
  * Creates QR Code symbol and returns a qrcode object.
  * @param text Text to encode or a list of objects describing segments.
