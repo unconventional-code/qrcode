@@ -1,12 +1,12 @@
 import fs from 'fs';
-import QRCode from '../../../lib/core/qrcode';
+import * as QRCode from '../../../lib/core/qrcode';
 import Utf8Renderer from '../../../lib/renderer/utf8';
 
 describe('Utf8Renderer interface', () => {
 	it('should have render function', () => {
-		expect(Utf8Renderer.render).toBeDefined()
-		expect(typeof Utf8Renderer.render).toBe('function')
-	})
+		expect(Utf8Renderer.render).toBeDefined();
+		expect(typeof Utf8Renderer.render).toBe('function');
+	});
 });
 
 describe('Utf8Renderer render', () => {
@@ -17,8 +17,8 @@ describe('Utf8Renderer render', () => {
 	it('should not throw with only qrData param', () => {
 		expect(() => {
 			str = Utf8Renderer.render(sampleQrData);
-		}).not.toThrow()
-	})
+		}).not.toThrow();
+	});
 
 	it('should not throw with options param', () => {
 		expect(() => {
@@ -26,13 +26,12 @@ describe('Utf8Renderer render', () => {
 				margin: 10,
 				scale: 1,
 			});
-		}).not.toThrow()
-	})
+		}).not.toThrow();
+	});
 
 	it('should return a string', () => {
-		expect(typeof str).toBe('string')
-	})
-
+		expect(typeof str).toBe('string');
+	});
 });
 
 describe('Utf8 renderToFile', () => {
@@ -42,31 +41,28 @@ describe('Utf8 renderToFile', () => {
 
 	afterEach(() => {
 		jest.restoreAllMocks();
-	})
+	});
 
 	it('should not generate errors with only qrData param', () => {
 		const fsSpy = jest.spyOn(fs, 'writeFile');
-		fsSpy.mockImplementation((path, data, cb) => {
-		});
+		fsSpy.mockImplementation((path, data, cb) => {});
 
 		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err: any) {
 			expect(err).toBeFalsy();
 		});
-	})
+	});
 
 	it('should save file with correct file name', () => {
 		const fsSpy = jest.spyOn(fs, 'writeFile');
-		fsSpy.mockImplementation((path, data, cb) => {
-		});
+		fsSpy.mockImplementation((path, data, cb) => {});
 		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err: any) {
 			expect(fsSpy).toHaveBeenCalledWith(fileName);
 		});
-	})
+	});
 
 	it('should not generate errors with options param', () => {
 		const fsSpy = jest.spyOn(fs, 'writeFile');
-		fsSpy.mockImplementation((path, data, cb) => {
-		});
+		fsSpy.mockImplementation((path, data, cb) => {});
 		Utf8Renderer.renderToFile(
 			fileName,
 			sampleQrData,
@@ -82,8 +78,7 @@ describe('Utf8 renderToFile', () => {
 
 	it('should save file with correct file name', () => {
 		const fsSpy = jest.spyOn(fs, 'writeFile');
-		fsSpy.mockImplementation((path, data, cb) => {
-		});
+		fsSpy.mockImplementation((path, data, cb) => {});
 		Utf8Renderer.renderToFile(
 			fileName,
 			sampleQrData,
@@ -95,7 +90,7 @@ describe('Utf8 renderToFile', () => {
 				expect(fsSpy).toHaveBeenCalledWith(fileName);
 			}
 		);
-	})
+	});
 
 	it('should fail if error occurs during save', () => {
 		const fsSpy = jest.spyOn(fs, 'writeFile');

@@ -1,8 +1,8 @@
-import fs from 'fs'
-import QRCode from '../../../lib/core/qrcode'
-import PngRenderer from '../../../lib/renderer/png'
-import PNG from 'pngjs'
-import StreamMock from '../../mocks/writable-stream'
+import fs from 'fs';
+import * as QRCode from '../../../lib/core/qrcode';
+import PngRenderer from '../../../lib/renderer/png';
+import PNG from 'pngjs';
+import StreamMock from '../../mocks/writable-stream';
 
 describe('PNG renderer interface', () => {
 	it('should have render function', () => {
@@ -37,7 +37,6 @@ describe('PNG render', () => {
 		}).not.toThrow();
 	});
 
-
 	it('should return an instance of PNG', () => {
 		expect(png instanceof PNG.PNG).toBe(true);
 	});
@@ -62,13 +61,12 @@ describe('PNG render', () => {
 
 	it('should be a square image', () => {
 		expect(png.width).toBe(png.height);
-	})
+	});
 
 	// modules: 25, margins: 10 * 2, scale: 1
 	it('should have correct size', () => {
 		expect(png.width).toBe(25 + 10 * 2);
 	});
-
 });
 
 describe('PNG renderToDataURL', () => {
@@ -79,42 +77,58 @@ describe('PNG renderToDataURL', () => {
 		PngRenderer.renderToDataURL(sampleQrData, function (err: any) {
 			expect(err).toBeFalsy();
 		});
-	})
+	});
 
 	it('should return a string', () => {
 		PngRenderer.renderToDataURL(sampleQrData, function (err: any, url: string) {
 			expect(typeof url).toBe('string');
 		});
-	})
+	});
 
 	it('should not generate errors with options param', () => {
-		PngRenderer.renderToDataURL(sampleQrData, {
-			margin: 10,
-			scale: 1,
-		}, function (err: any, url: string) {
-			expect(err).toBeFalsy();
-		});
-	})
+		PngRenderer.renderToDataURL(
+			sampleQrData,
+			{
+				margin: 10,
+				scale: 1,
+			},
+			function (err: any, url: string) {
+				expect(err).toBeFalsy();
+			}
+		);
+	});
 
 	it('should return a string', () => {
-		PngRenderer.renderToDataURL(sampleQrData, {
-			margin: 10,
-			scale: 1,
-		}, function (err: any, url: string) {
-			expect(typeof url).toBe('string');
-		});
-	})
+		PngRenderer.renderToDataURL(
+			sampleQrData,
+			{
+				margin: 10,
+				scale: 1,
+			},
+			function (err: any, url: string) {
+				expect(typeof url).toBe('string');
+			}
+		);
+	});
 
 	it('should have correct header', () => {
-		PngRenderer.renderToDataURL(sampleQrData, { margin: 10, scale: 1 }, function (err: any, url: string) {
-			expect(url.split(',')[0]).toBe('data:image/png;base64');
-		});
-	})
+		PngRenderer.renderToDataURL(
+			sampleQrData,
+			{ margin: 10, scale: 1 },
+			function (err: any, url: string) {
+				expect(url.split(',')[0]).toBe('data:image/png;base64');
+			}
+		);
+	});
 
 	it('should have a correct length', () => {
-		PngRenderer.renderToDataURL(sampleQrData, { margin: 10, scale: 1 }, function (err: any, url: string) {
-			expect(url.split(',')[1].length % 4).toBe(0);
-		});
+		PngRenderer.renderToDataURL(
+			sampleQrData,
+			{ margin: 10, scale: 1 },
+			function (err: any, url: string) {
+				expect(url.split(',')[1].length % 4).toBe(0);
+			}
+		);
 	});
 });
 
@@ -158,7 +172,7 @@ describe('PNG renderToFile', () => {
 				expect(err).toBeFalsy();
 			}
 		);
-	})
+	});
 
 	it('should save file with correct file name', () => {
 		const fsSpy = jest.spyOn(fs, 'createWriteStream');
@@ -182,9 +196,8 @@ describe('PNG renderToFile', () => {
 		jest.spyOn(fs, 'createWriteStream').mockReturnValue(new StreamMock().forceErrorOnWrite());
 
 		PngRenderer.renderToFile(fileName, sampleQrData, function (err: any) {
-		  expect(err).toBeTruthy();
+			expect(err).toBeTruthy();
 		});
-
 	});
 });
 
@@ -197,7 +210,6 @@ describe('PNG renderToFileStream', () => {
 			PngRenderer.renderToFileStream(new StreamMock(), sampleQrData);
 		}).not.toThrow();
 	});
-
 
 	it('should not throw with options param', () => {
 		expect(() => {

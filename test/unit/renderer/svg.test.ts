@@ -1,6 +1,6 @@
 import fs from 'fs';
 import * as htmlparser from 'htmlparser2';
-import QRCode from '../../../lib/core/qrcode';
+import * as QRCode from '../../../lib/core/qrcode';
 import SvgRenderer from '../../../lib/renderer/svg';
 
 function getExpectedViewbox(size: number, margin: number) {
@@ -181,7 +181,6 @@ describe('Svg render', () => {
 			});
 		});
 	});
-
 });
 
 describe('Svg renderToFile', () => {

@@ -1,5 +1,5 @@
 import * as Mode from '../../../lib/core/mode';
-import Segments from '../../../lib/core/segments';
+import * as Segments from '../../../lib/core/segments';
 import NumericData from '../../../lib/core/numeric-data';
 import AlphanumericData from '../../../lib/core/alphanumeric-data';
 import ByteData from '../../../lib/core/byte-data';

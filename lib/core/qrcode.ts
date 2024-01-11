@@ -1,16 +1,17 @@
-const Utils = require('./utils');
-const ECLevel = require('./error-correction-level');
-const BitBuffer = require('./bit-buffer');
-const BitMatrix = require('./bit-matrix');
-const AlignmentPattern = require('./alignment-pattern');
-const FinderPattern = require('./finder-pattern');
-const MaskPattern = require('./mask-pattern');
-const ECCode = require('./error-correction-code');
-const ReedSolomonEncoder = require('./reed-solomon-encoder');
-const Version = require('./version');
-const FormatInfo = require('./format-info');
-const Mode = require('./mode');
-const Segments = require('./segments');
+// @ts-nocheck
+import * as Utils from './utils';
+import * as ECLevel from './error-correction-level';
+import BitBuffer from './bit-buffer';
+import BitMatrix from './bit-matrix';
+import * as AlignmentPattern from './alignment-pattern';
+import * as FinderPattern from './finder-pattern';
+import * as MaskPattern from './mask-pattern';
+import * as ECCode from './error-correction-code';
+import ReedSolomonEncoder from './reed-solomon-encoder';
+import Version from './version';
+import * as FormatInfo from './format-info';
+import * as Mode from './mode';
+import * as Segments from './segments';
 
 /**
  * QRCode for JavaScript

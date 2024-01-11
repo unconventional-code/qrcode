@@ -1,7 +1,7 @@
 // @ts-nocheck
 import * as ECLevel from '../../../lib/core/error-correction-level';
 import Version from '../../../lib/core/version';
-import QRCode from '../../../lib/core/qrcode';
+import * as QRCode from '../../../lib/core/qrcode';
 import toSJIS from '../../../helper/to-sjis';
 
 describe('QRCode interface', () => {
