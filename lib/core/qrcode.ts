@@ -478,7 +478,7 @@ function createSymbol(data, version, errorCorrectionLevel, maskPattern) {
  * @param {String} options.errorCorrectionLevel Error correction level
  * @param {Function} options.toSJISFunc         Helper func to convert utf8 to sjis
  */
-exports.create = function create(data, options) {
+export function create(data, options) {
 	if (typeof data === 'undefined' || data === '') {
 		throw new Error('No input text');
 	}
@@ -499,4 +499,4 @@ exports.create = function create(data, options) {
 	}
 
 	return createSymbol(data, version, errorCorrectionLevel, mask);
-};
+}

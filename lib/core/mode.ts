@@ -180,7 +180,7 @@ function fromString(str: string) {
  * @param  {Mode}        defaultValue Fallback value
  * @return {Mode}                     Encoding mode
  */
-export function from(value: Mode | string, defaultValue?: Mode): Mode | undefined {
+export function from(value: Mode | string, defaultValue: Mode = BYTE): Mode {
 	if (exports.isValid(value as Mode)) {
 		return value as Mode;
 	}

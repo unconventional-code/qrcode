@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Mode from './mode';
 import NumericData from './numeric-data';
 import AlphanumericData from './alphanumeric-data';
@@ -374,7 +373,7 @@ function buildSingleSegment(data: string, modesHint: Mode.Mode | string) {
  * @param  {Array} array Array of objects with segments data
  * @return {Array}       Array of Segments
  */
-export function fromArray(array: QRCodeSegment[]) {
+export function fromArray(array: (QRCodeSegment | string)[]) {
 	return array.reduce(function (acc, seg) {
 		console.log({ seg });
 		if (typeof seg === 'string') {

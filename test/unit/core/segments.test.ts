@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Mode from '../../../lib/core/mode';
 import * as Segments from '../../../lib/core/segments';
 import NumericData from '../../../lib/core/numeric-data';
