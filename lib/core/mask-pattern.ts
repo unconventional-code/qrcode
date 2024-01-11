@@ -174,28 +174,39 @@ export function getPenaltyN4(bitMatrix: BitMatrix) {
  * @param  {Number} j           Column
  * @return {Boolean}            Mask value
  */
-function getMaskAt(maskPattern: number, i: number, j: number) {
+function getMaskAt(maskPattern: number, i: number, j: number): number {
+	let result: boolean;
 	switch (maskPattern) {
 		case Patterns.PATTERN000:
-			return (i + j) % 2 === 0;
+			result = (i + j) % 2 === 0;
+			break;
 		case Patterns.PATTERN001:
-			return i % 2 === 0;
+			result = i % 2 === 0;
+			break;
 		case Patterns.PATTERN010:
-			return j % 3 === 0;
+			result = j % 3 === 0;
+			break;
 		case Patterns.PATTERN011:
-			return (i + j) % 3 === 0;
+			result = (i + j) % 3 === 0;
+			break;
 		case Patterns.PATTERN100:
-			return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0;
+			result = (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0;
+			break;
 		case Patterns.PATTERN101:
-			return ((i * j) % 2) + ((i * j) % 3) === 0;
+			result = ((i * j) % 2) + ((i * j) % 3) === 0;
+			break;
 		case Patterns.PATTERN110:
-			return (((i * j) % 2) + ((i * j) % 3)) % 2 === 0;
+			result = (((i * j) % 2) + ((i * j) % 3)) % 2 === 0;
+			break;
 		case Patterns.PATTERN111:
-			return (((i * j) % 3) + ((i + j) % 2)) % 2 === 0;
+			result = (((i * j) % 3) + ((i + j) % 2)) % 2 === 0;
+			break;
 
 		default:
 			throw new Error('bad maskPattern:' + maskPattern);
 	}
+
+	return result ? 1 : 0;
 }
 
 /**

@@ -2,10 +2,10 @@ import BitMatrix from '../../../lib/core/bit-matrix';
 
 describe('Bit Matrix', () => {
 	it('should throw if size is 0', () => {
-		expect(() => BitMatrix(0)).toThrow();
-	})
+		expect(() => new BitMatrix(0)).toThrow();
+	});
 	it('should throw if size is less than 0', () => {
-		expect(() => BitMatrix(-1)).toThrow();
+		expect(() => new BitMatrix(-1)).toThrow();
 	});
 
 	it('should have correct size', () => {
@@ -22,7 +22,7 @@ describe('Bit Matrix', () => {
 		const bm = new BitMatrix(2);
 		bm.set(0, 1, true, true);
 		expect(bm.get(0, 1)).toBe(1);
-	})
+	});
 	it('should correctly set bit as reserved', () => {
 		const bm = new BitMatrix(2);
 		bm.set(0, 1, true, true);
@@ -34,11 +34,11 @@ describe('Bit Matrix', () => {
 		bm.set(0, 1, true, true);
 		bm.xor(0, 1, 1);
 		expect(bm.get(0, 1)).toBe(0);
-	})
+	});
 
 	it('should correctly set bit to false (0)', () => {
 		const bm = new BitMatrix(2);
 		bm.set(0, 1, false);
 		expect(bm.get(0, 1)).toBe(0);
-	})
+	});
 });
