@@ -5,6 +5,8 @@ import {
 } from '../lib/core/error-correction-level';
 import { Mode } from '../lib/core/mode';
 import { QRCodeMaskPattern } from '../lib/core/mask-pattern';
+import BitMatrix from '../lib/core/bit-matrix';
+import { QRCodeSegment } from '../lib/core/segments';
 
 export type QRCodeToSJISFunc = (codePoint: string) => number;
 
@@ -188,37 +190,6 @@ export interface QRCodeRenderersOptions extends QRCodeOptions {
 		| undefined;
 }
 
-export type QRCodeSegmentMode = 'alphanumeric' | 'numeric' | 'byte' | 'kanji';
-export type QRCodeSegment =
-	| QRCodeNumericSegment
-	| QRCodeAlphanumericSegment
-	| QRCodeByteSegment
-	| QRCodeKanjiSegment
-	| {
-			mode?: never;
-			data: string | Buffer | Uint8ClampedArray | Uint8Array;
-	  };
-
-export interface QRCodeNumericSegment {
-	mode: 'numeric';
-	data: string | number;
-}
-
-export interface QRCodeAlphanumericSegment {
-	mode: 'alphanumeric';
-	data: string;
-}
-
-export interface QRCodeByteSegment {
-	mode: 'byte';
-	data: Buffer | Uint8ClampedArray | Uint8Array;
-}
-
-export interface QRCodeKanjiSegment {
-	mode: 'kanji';
-	data: string;
-}
-
 export interface QRCode {
 	/**
 	 * BitMatrix class with modules data
@@ -240,35 +211,6 @@ export interface QRCode {
 	 * Generated segments
 	 */
 	segments: GeneratedQRCodeSegment[];
-}
-
-/**
- * Helper class to handle QR Code symbol modules.
- */
-export interface BitMatrix {
-	/**
-	 * Symbol size.
-	 */
-	size: number;
-	data: Uint8Array;
-	reservedBit: Uint8Array;
-	/**
-	 * Set bit value at specified location
-	 * If reserved flag is set, this bit will be ignored during masking process.
-	 */
-	set(row: number, col: number, value: number, reserved: boolean): void;
-	/**
-	 * @return Bit value at specified location.
-	 */
-	get(row: number, col: number): number;
-	/**
-	 * Applies xor operator at specified location (used during masking process).
-	 */
-	xor(row: number, col: number, value: number): void;
-	/**
-	 * Check if bit at specified location is reserved.
-	 */
-	isReserved(row: number, col: number): number;
 }
 
 export type GeneratedQRCodeSegment = NumericData | AlphanumericData | ByteData | KanjiData;
