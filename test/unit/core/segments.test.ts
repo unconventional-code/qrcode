@@ -5,7 +5,7 @@ import AlphanumericData from '../../../lib/core/alphanumeric-data';
 import ByteData from '../../../lib/core/byte-data';
 import StructuredAppendData from '../../../lib/core/structured-append-data';
 import toSJIS from '../../../helper/to-sjis';
-import Utils from '../../../lib/core/utils';
+import * as Utils from '../../../lib/core/utils';
 
 let testData = [
 	{
@@ -159,13 +159,12 @@ const kanjiTestData = [
 testData = testData.concat(kanjiTestData);
 
 describe('Segments from array', () => {
-
 	it('should return correct segment from array of string', () => {
 		expect(Segments.fromArray(['abcdef', '12345'])).toEqual([
 			new ByteData('abcdef'),
 			new NumericData('12345'),
 		]);
-	})
+	});
 
 	it('should return correct segment from array of objects', () => {
 		expect(
@@ -183,58 +182,57 @@ describe('Segments from array', () => {
 				{ data: '12345', mode: 'numeric' },
 			])
 		).toEqual([new ByteData('abcdef'), new NumericData('12345')]);
-	})
+	});
 
 	it('should return correct segment from array of objects if mode is not specified', () => {
-		expect(
-			Segments.fromArray([
-				{ data: 'abcdef' },
-				{ data: '12345' },
-			])
-		).toEqual([new ByteData('abcdef'), new NumericData('12345')]);
-	})
+		expect(Segments.fromArray([{ data: 'abcdef' }, { data: '12345' }])).toEqual([
+			new ByteData('abcdef'),
+			new NumericData('12345'),
+		]);
+	});
 
 	it('should return an empty array if input payload is empty', () => {
 		expect(Segments.fromArray([{}])).toEqual([]);
 	});
 
 	it('should return an empty array if input is empty', () => {
-		expect(Segments.fromArray([])).toEqual([])
+		expect(Segments.fromArray([])).toEqual([]);
 	});
 
-
-	it( 'should throw if segment cannot be encoded with specified mode', () => {
+	it('should throw if segment cannot be encoded with specified mode', () => {
 		expect(() => {
 			Segments.fromArray([{ data: 'ABCDE', mode: 'numeric' }]);
 		}).toThrow();
-	})
+	});
 
 	it('should use Byte mode if kanji support is disabled', () => {
 		expect(Segments.fromArray([{ data: '０１２３', mode: Mode.KANJI }])).toEqual([
 			new ByteData('０１２３'),
 		]);
-	})
+	});
 });
 
 describe('Segments optimization', () => {
-	it(
-		'should use Byte mode if Kanji support is disabled', () => {
-			expect(Segments.fromString('乂ЁЖ', 1)).toEqual(
-		Segments.fromArray([{ data: '乂ЁЖ', mode: 'byte' }]))
-	})
+	it('should use Byte mode if Kanji support is disabled', () => {
+		expect(Segments.fromString('乂ЁЖ', 1)).toEqual(
+			Segments.fromArray([{ data: '乂ЁЖ', mode: 'byte' }])
+		);
+	});
 
 	it('should use Structured Append mode', () => {
-		expect(Segments.fromArray([
-			{ data: { position: 0x1, total: 0x3, parity: 0x0a }, mode: 'structuredappend' },
-		])).toEqual([new StructuredAppendData({ position: 0x1, total: 0x3, parity: 0x0a })])
-	})
+		expect(
+			Segments.fromArray([
+				{ data: { position: 0x1, total: 0x3, parity: 0x0a }, mode: 'structuredappend' },
+			])
+		).toEqual([new StructuredAppendData({ position: 0x1, total: 0x3, parity: 0x0a })]);
+	});
 
 	it('should use Kanji mode', () => {
 		Utils.setToSJISFunction(toSJIS);
 		testData.forEach(function (data) {
 			expect(Segments.fromString(data.input, 1)).toEqual(Segments.fromArray(data.result));
 		});
-	})
+	});
 });
 
 describe('Segments raw split', () => {
