@@ -1,12 +1,11 @@
-const test = require('tap').test;
-const Mode = require('core/mode');
-const Segments = require('core/segments');
-const NumericData = require('core/numeric-data');
-const AlphanumericData = require('core/alphanumeric-data');
-const ByteData = require('core/byte-data');
-const StructuredAppendData = require('core/structured-append-data');
-const toSJIS = require('helper/to-sjis');
-const Utils = require('core/utils');
+import Mode from '../../../lib/core/mode';
+import Segments from '../../../lib/core/segments';
+import NumericData from '../../../lib/core/numeric-data';
+import AlphanumericData from '../../../lib/core/alphanumeric-data';
+import ByteData from '../../../lib/core/byte-data';
+import StructuredAppendData from '../../../lib/core/structured-append-data';
+import toSJIS from '../../../helper/to-sjis';
+import Utils from '../../../lib/core/utils';
 
 let testData = [
 	{
@@ -159,79 +158,89 @@ const kanjiTestData = [
 
 testData = testData.concat(kanjiTestData);
 
-test('Segments from array', function (t) {
-	t.deepEqual(
-		Segments.fromArray(['abcdef', '12345']),
-		[new ByteData('abcdef'), new NumericData('12345')],
-		'Should return correct segment from array of string'
-	);
+describe('Segments from array', () => {
 
-	t.deepEqual(
-		Segments.fromArray([
-			{ data: 'abcdef', mode: Mode.BYTE },
-			{ data: '12345', mode: Mode.NUMERIC },
-		]),
-		[new ByteData('abcdef'), new NumericData('12345')],
-		'Should return correct segment from array of objects'
-	);
+	it('should return correct segment from array of string', () => {
+		expect(Segments.fromArray(['abcdef', '12345'])).toEqual([
+			new ByteData('abcdef'),
+			new NumericData('12345'),
+		]);
+	})
 
-	t.deepEqual(
-		Segments.fromArray([
-			{ data: 'abcdef', mode: 'byte' },
-			{ data: '12345', mode: 'numeric' },
-		]),
-		[new ByteData('abcdef'), new NumericData('12345')],
-		'Should return correct segment from array of objects if mode is specified as string'
-	);
-
-	t.deepEqual(
-		Segments.fromArray([{ data: 'abcdef' }, { data: '12345' }]),
-		[new ByteData('abcdef'), new NumericData('12345')],
-		'Should return correct segment from array of objects if mode is not specified'
-	);
-
-	t.deepEqual(Segments.fromArray([{}]), [], 'Should return an empty array');
-
-	t.throw(function () {
-		Segments.fromArray([{ data: 'ABCDE', mode: 'numeric' }]);
-	}, 'Should throw if segment cannot be encoded with specified mode');
-
-	t.deepEqual(
-		Segments.fromArray([{ data: '０１２３', mode: Mode.KANJI }]),
-		[new ByteData('０１２３')],
-		'Should use Byte mode if kanji support is disabled'
-	);
-
-	t.end();
-});
-
-test('Segments optimization', function (t) {
-	t.deepEqual(
-		Segments.fromString('乂ЁЖ', 1),
-		Segments.fromArray([{ data: '乂ЁЖ', mode: 'byte' }]),
-		'Should use Byte mode if Kanji support is disabled'
-	);
-
-	t.deepEqual(
-		Segments.fromArray([
-			{ data: { position: 0x1, total: 0x3, parity: 0x0a }, mode: 'structuredappend' },
-		]),
-		[new StructuredAppendData({ position: 0x1, total: 0x3, parity: 0x0a })],
-		'Should use Structured Append mode'
-	);
-
-	Utils.setToSJISFunction(toSJIS);
-	testData.forEach(function (data) {
-		t.deepEqual(Segments.fromString(data.input, 1), Segments.fromArray(data.result));
+	it('should return correct segment from array of objects', () => {
+		expect(
+			Segments.fromArray([
+				{ data: 'abcdef', mode: Mode.BYTE },
+				{ data: '12345', mode: Mode.NUMERIC },
+			])
+		).toEqual([new ByteData('abcdef'), new NumericData('12345')]);
 	});
 
-	t.end();
+	it('should return correct segment from array of objects if mode is specified as string', () => {
+		expect(
+			Segments.fromArray([
+				{ data: 'abcdef', mode: 'byte' },
+				{ data: '12345', mode: 'numeric' },
+			])
+		).toEqual([new ByteData('abcdef'), new NumericData('12345')]);
+	})
+
+	it('should return correct segment from array of objects if mode is not specified', () => {
+		expect(
+			Segments.fromArray([
+				{ data: 'abcdef' },
+				{ data: '12345' },
+			])
+		).toEqual([new ByteData('abcdef'), new NumericData('12345')]);
+	})
+
+	it('should return an empty array if input payload is empty', () => {
+		expect(Segments.fromArray([{}])).toEqual([]);
+	});
+
+	it('should return an empty array if input is empty', () => {
+		expect(Segments.fromArray([])).toEqual([])
+	});
+
+
+	it( 'should throw if segment cannot be encoded with specified mode', () => {
+		expect(() => {
+			Segments.fromArray([{ data: 'ABCDE', mode: 'numeric' }]);
+		}).toThrow();
+	})
+
+	it('should use Byte mode if kanji support is disabled', () => {
+		expect(Segments.fromArray([{ data: '０１２３', mode: Mode.KANJI }])).toEqual([
+			new ByteData('０１２３'),
+		]);
+	})
 });
 
-test('Segments raw split', function (t) {
+describe('Segments optimization', () => {
+	it(
+		'should use Byte mode if Kanji support is disabled', () => {
+			expect(Segments.fromString('乂ЁЖ', 1)).toEqual(
+		Segments.fromArray([{ data: '乂ЁЖ', mode: 'byte' }]))
+	})
+
+	it('should use Structured Append mode', () => {
+		expect(Segments.fromArray([
+			{ data: { position: 0x1, total: 0x3, parity: 0x0a }, mode: 'structuredappend' },
+		])).toEqual([new StructuredAppendData({ position: 0x1, total: 0x3, parity: 0x0a })])
+	})
+
+	it('should use Kanji mode', () => {
+		Utils.setToSJISFunction(toSJIS);
+		testData.forEach(function (data) {
+			expect(Segments.fromString(data.input, 1)).toEqual(Segments.fromArray(data.result));
+		});
+	})
+});
+
+describe('Segments raw split', () => {
 	const splitted = [new ByteData('abc'), new AlphanumericData('DEF'), new NumericData('123')];
 
-	t.deepEqual(Segments.rawSplit('abcDEF123'), splitted);
-
-	t.end();
+	it('should return correct segments', () => {
+		expect(Segments.rawSplit('abcDEF123')).toEqual(splitted);
+	});
 });
