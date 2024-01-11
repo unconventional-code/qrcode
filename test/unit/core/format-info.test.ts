@@ -1,4 +1,4 @@
-import FormatInfo from '../../../lib/core/format-info';
+import * as FormatInfo from '../../../lib/core/format-info';
 import * as ECLevel from '../../../lib/core/error-correction-level';
 import MaskPattern from '../../../lib/core/mask-pattern';
 
