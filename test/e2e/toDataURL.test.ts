@@ -2,7 +2,7 @@
 import QRCode from '../../lib';
 import QRCodeBrowser from '../../lib/browser';
 import { createCanvas } from 'canvas';
-import Helpers from '../helpers';
+import * as Helpers from '../helpers';
 
 describe('toDataURL - no promise available', () => {
 	beforeAll(() => {

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import QRCode from '../../lib';
 import browser from '../../lib/browser';
-import Helpers from '../helpers';
+import * as Helpers from '../helpers';
 
 describe('toString - no promise available', () => {
 	beforeAll(() => {

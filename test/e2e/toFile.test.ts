@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import QRCode from '../../lib';
-import Helpers from '../helpers';
+import * as Helpers from '../helpers';
 import StreamMock from '../mocks/writable-stream';
 
 describe('toFile - no promise available', () => {

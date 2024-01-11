@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Canvas, createCanvas } from 'canvas';
 import QRCode from '../../lib';
-import Helpers from '../helpers';
+import * as Helpers from '../helpers';
 
 describe('toCanvas - no promise available', () => {
 	// Mock document object
