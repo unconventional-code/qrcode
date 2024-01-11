@@ -1,4 +1,4 @@
-import pattern from '../../../lib/core/alignment-pattern';
+import * as pattern from '../../../lib/core/alignment-pattern';
 
 /**
  * Row/column coordinates of the center module of each alignment pattern.

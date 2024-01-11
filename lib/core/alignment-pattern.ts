@@ -8,7 +8,7 @@
  * and their number depends on the symbol version.
  */
 
-const getSymbolSize = require('./utils').getSymbolSize;
+import { getSymbolSize } from './utils';
 
 /**
  * Calculate the row/column coordinates of the center module of each alignment pattern
@@ -21,14 +21,13 @@ const getSymbolSize = require('./utils').getSymbolSize;
  * Each item of the array will represent in turn the x and y coordinate.
  * @see {@link getPositions}
  *
- * @param  {Number} version QR Code version
- * @return {Array}          Array of coordinate
+ * @return {Array} Array of coordinate
  */
-exports.getRowColCoords = function getRowColCoords(version) {
-	if (version === 1) return [];
+export function getRowColCoords(qrCodeVersion: number): number[] {
+	if (qrCodeVersion === 1) return [];
 
-	const posCount = Math.floor(version / 7) + 2;
-	const size = getSymbolSize(version);
+	const posCount = Math.floor(qrCodeVersion / 7) + 2;
+	const size = getSymbolSize(qrCodeVersion);
 	const intervals = size === 145 ? 26 : Math.ceil((size - 13) / (2 * posCount - 2)) * 2;
 	const positions = [size - 7]; // Last coord is always (size - 7)
 
@@ -39,7 +38,7 @@ exports.getRowColCoords = function getRowColCoords(version) {
 	positions.push(6); // First coord is always 6
 
 	return positions.reverse();
-};
+}
 
 /**
  * Returns an array containing the positions of each alignment pattern.
@@ -48,22 +47,16 @@ exports.getRowColCoords = function getRowColCoords(version) {
  * Coordinates are calculated expanding the row/column coordinates returned by {@link getRowColCoords}
  * and filtering out the items that overlaps with finder pattern
  *
- * @example
- * For a Version 7 symbol {@link getRowColCoords} returns values 6, 22 and 38.
- * The alignment patterns, therefore, are to be centered on (row, column)
- * positions (6,22), (22,6), (22,22), (22,38), (38,22), (38,38).
- * Note that the coordinates (6,6), (6,38), (38,6) are occupied by finder patterns
- * and are not therefore used for alignment patterns.
+ * @example For a Version 7 symbol {@link getRowColCoords} returns values 6, 22 and 38. The alignment patterns, therefore, are to be centered on (row, column) positions (6,22), (22,6), (22,22), (22,38), (38,22), (38,38). Note that the coordinates (6,6), (6,38), (38,6) are occupied by finder patterns and are not therefore used for alignment patterns.
  *
  * let pos = getPositions(7)
- * // [[6,22], [22,6], [22,22], [22,38], [38,22], [38,38]]
+ * let pos = [[6,22], [22,6], [22,22], [22,38], [38,22], [38,38]]
  *
- * @param  {Number} version QR Code version
- * @return {Array}          Array of coordinates
+ * @return {Array} Array of coordinates
  */
-exports.getPositions = function getPositions(version) {
-	const coords = [];
-	const pos = exports.getRowColCoords(version);
+export function getPositions(qrCodeVersion: number): [number, number][] {
+	const coords: [number, number][] = [];
+	const pos = exports.getRowColCoords(qrCodeVersion);
 	const posLength = pos.length;
 
 	for (let i = 0; i < posLength; i++) {
@@ -83,4 +76,4 @@ exports.getPositions = function getPositions(version) {
 	}
 
 	return coords;
-};
+}
