@@ -4,6 +4,9 @@
  * @param {Number} size Symbol size
  */
 export default class BitMatrix {
+	/**
+	 * Symbol size.
+	 */
 	size: number;
 	data: Uint8Array;
 	reservedBit: Uint8Array;
@@ -26,7 +29,7 @@ export default class BitMatrix {
 	 * @param {Boolean} value
 	 * @param {Boolean} reserved
 	 */
-	set(row: number, col: number, value: Boolean, reserved = false) {
+	set(row: number, col: number, value: number, reserved = false) {
 		const index = row * this.size + col;
 		this.data[index] = value ? 1 : 0;
 		if (reserved) {
