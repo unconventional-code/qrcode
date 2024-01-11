@@ -29,7 +29,7 @@
   "license": "MIT",
   "scripts": {
     "lint:check:prettier": "prettier --check ./**/*.{ts,js,tsx,jsx,graphql,yaml,yml} --no-error-on-unmatched-pattern",
-		"lint:fix:prettier": "prettier --write ./**/*.{ts,js,jsx,tsx,json,graphql,yaml,yml} --no-error-on-unmatched-pattern",
+    "lint:fix:prettier": "prettier --write ./**/*.{ts,js,jsx,tsx,json,graphql,yaml,yml} --no-error-on-unmatched-pattern",
     "lint": "npm run lint:check:prettier",
     "pretest": "npm run lint",
     "test": "node --throw-deprecation test.js",
@@ -59,6 +59,7 @@
     "colors": "^1.4.0",
     "express": "^4.17.1",
     "htmlparser2": "^4.1.0",
+    "prettier": "^3.1.1",
     "rollup": "^2.6.1",
     "rollup-plugin-terser": "^5.3.0",
     "sinon": "^9.0.2",

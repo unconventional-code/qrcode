@@ -1,3 +1,5 @@
 build
-examples/vendors
-lib/core/regex.js
+./examples/vendors
+# ./lib/core/regex.js
+# !./lib
+./lib/core/alphanumeric-data.js
