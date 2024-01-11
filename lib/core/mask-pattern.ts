@@ -1,8 +1,12 @@
+import BitMatrix from './bit-matrix';
+
+export type QRCodeMaskPattern = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 /**
  * Data mask pattern reference
  * @type {Object}
  */
-exports.Patterns = {
+export const Patterns: Record<string, QRCodeMaskPattern> = {
 	PATTERN000: 0,
 	PATTERN001: 1,
 	PATTERN010: 2,
@@ -27,12 +31,14 @@ const PenaltyScores = {
 /**
  * Check if mask pattern value is valid
  *
- * @param  {Number}  mask    Mask pattern
+ * @param  {Number}  maskPattern    Mask pattern
  * @return {Boolean}         true if valid, false otherwise
  */
-exports.isValid = function isValid(mask) {
-	return mask != null && mask !== '' && !isNaN(mask) && mask >= 0 && mask <= 7;
-};
+export function isValid(maskPattern: number) {
+	return (
+		typeof maskPattern === 'number' && !isNaN(maskPattern) && maskPattern >= 0 && maskPattern <= 7
+	);
+}
 
 /**
  * Returns mask pattern from a value.
@@ -41,9 +47,9 @@ exports.isValid = function isValid(mask) {
  * @param  {Number|String} value        Mask pattern value
  * @return {Number}                     Valid mask pattern or undefined
  */
-exports.from = function from(value) {
-	return exports.isValid(value) ? parseInt(value, 10) : undefined;
-};
+export function from(value: number | string) {
+	return isValid(value as number) ? parseInt(value as string, 10) : undefined;
+}
 
 /**
  * Find adjacent modules in row/column with the same color
@@ -52,8 +58,8 @@ exports.from = function from(value) {
  * Points: N1 + i
  * i is the amount by which the number of adjacent modules of the same color exceeds 5
  */
-exports.getPenaltyN1 = function getPenaltyN1(data) {
-	const size = data.size;
+export function getPenaltyN1(bitMatrix: BitMatrix) {
+	const size = bitMatrix.size;
 	let points = 0;
 	let sameCountCol = 0;
 	let sameCountRow = 0;
@@ -65,7 +71,7 @@ exports.getPenaltyN1 = function getPenaltyN1(data) {
 		lastCol = lastRow = null;
 
 		for (let col = 0; col < size; col++) {
-			let module = data.get(row, col);
+			let module = bitMatrix.get(row, col);
 			if (module === lastCol) {
 				sameCountCol++;
 			} else {
@@ -74,7 +80,7 @@ exports.getPenaltyN1 = function getPenaltyN1(data) {
 				sameCountCol = 1;
 			}
 
-			module = data.get(col, row);
+			module = bitMatrix.get(col, row);
 			if (module === lastRow) {
 				sameCountRow++;
 			} else {
@@ -89,31 +95,31 @@ exports.getPenaltyN1 = function getPenaltyN1(data) {
 	}
 
 	return points;
-};
+}
 
 /**
  * Find 2x2 blocks with the same color and assign a penalty value
  *
  * Points: N2 * (m - 1) * (n - 1)
  */
-exports.getPenaltyN2 = function getPenaltyN2(data) {
-	const size = data.size;
+export function getPenaltyN2(bitMatrix: BitMatrix) {
+	const size = bitMatrix.size;
 	let points = 0;
 
 	for (let row = 0; row < size - 1; row++) {
 		for (let col = 0; col < size - 1; col++) {
 			const last =
-				data.get(row, col) +
-				data.get(row, col + 1) +
-				data.get(row + 1, col) +
-				data.get(row + 1, col + 1);
+				(bitMatrix.get(row, col) ? 1 : 0) +
+				(bitMatrix.get(row, col + 1) ? 1 : 0) +
+				(bitMatrix.get(row + 1, col) ? 1 : 0) +
+				(bitMatrix.get(row + 1, col + 1) ? 1 : 0);
 
 			if (last === 4 || last === 0) points++;
 		}
 	}
 
 	return points * PenaltyScores.N2;
-};
+}
 
 /**
  * Find 1:1:3:1:1 ratio (dark:light:dark:light:dark) pattern in row/column,
@@ -121,8 +127,8 @@ exports.getPenaltyN2 = function getPenaltyN2(data) {
  *
  * Points: N3 * number of pattern found
  */
-exports.getPenaltyN3 = function getPenaltyN3(data) {
-	const size = data.size;
+export function getPenaltyN3(bitMatrix: BitMatrix) {
+	const size = bitMatrix.size;
 	let points = 0;
 	let bitsCol = 0;
 	let bitsRow = 0;
@@ -130,16 +136,16 @@ exports.getPenaltyN3 = function getPenaltyN3(data) {
 	for (let row = 0; row < size; row++) {
 		bitsCol = bitsRow = 0;
 		for (let col = 0; col < size; col++) {
-			bitsCol = ((bitsCol << 1) & 0x7ff) | data.get(row, col);
+			bitsCol = ((bitsCol << 1) & 0x7ff) | (bitMatrix.get(row, col) ? 1 : 0);
 			if (col >= 10 && (bitsCol === 0x5d0 || bitsCol === 0x05d)) points++;
 
-			bitsRow = ((bitsRow << 1) & 0x7ff) | data.get(col, row);
+			bitsRow = ((bitsRow << 1) & 0x7ff) | (bitMatrix.get(col, row) ? 1 : 0);
 			if (col >= 10 && (bitsRow === 0x5d0 || bitsRow === 0x05d)) points++;
 		}
 	}
 
 	return points * PenaltyScores.N3;
-};
+}
 
 /**
  * Calculate proportion of dark modules in entire symbol
@@ -149,16 +155,16 @@ exports.getPenaltyN3 = function getPenaltyN3(data) {
  * k is the rating of the deviation of the proportion of dark modules
  * in the symbol from 50% in steps of 5%
  */
-exports.getPenaltyN4 = function getPenaltyN4(data) {
+export function getPenaltyN4(bitMatrix: BitMatrix) {
 	let darkCount = 0;
-	const modulesCount = data.data.length;
+	const modulesCount = bitMatrix.data.length;
 
-	for (let i = 0; i < modulesCount; i++) darkCount += data.data[i];
+	for (let i = 0; i < modulesCount; i++) darkCount += bitMatrix.data[i];
 
 	const k = Math.abs(Math.ceil((darkCount * 100) / modulesCount / 5) - 10);
 
 	return k * PenaltyScores.N4;
-};
+}
 
 /**
  * Return mask value at given position
@@ -168,23 +174,23 @@ exports.getPenaltyN4 = function getPenaltyN4(data) {
  * @param  {Number} j           Column
  * @return {Boolean}            Mask value
  */
-function getMaskAt(maskPattern, i, j) {
+function getMaskAt(maskPattern: number, i: number, j: number) {
 	switch (maskPattern) {
-		case exports.Patterns.PATTERN000:
+		case Patterns.PATTERN000:
 			return (i + j) % 2 === 0;
-		case exports.Patterns.PATTERN001:
+		case Patterns.PATTERN001:
 			return i % 2 === 0;
-		case exports.Patterns.PATTERN010:
+		case Patterns.PATTERN010:
 			return j % 3 === 0;
-		case exports.Patterns.PATTERN011:
+		case Patterns.PATTERN011:
 			return (i + j) % 3 === 0;
-		case exports.Patterns.PATTERN100:
+		case Patterns.PATTERN100:
 			return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0;
-		case exports.Patterns.PATTERN101:
+		case Patterns.PATTERN101:
 			return ((i * j) % 2) + ((i * j) % 3) === 0;
-		case exports.Patterns.PATTERN110:
+		case Patterns.PATTERN110:
 			return (((i * j) % 2) + ((i * j) % 3)) % 2 === 0;
-		case exports.Patterns.PATTERN111:
+		case Patterns.PATTERN111:
 			return (((i * j) % 3) + ((i + j) % 2)) % 2 === 0;
 
 		default:
@@ -198,41 +204,44 @@ function getMaskAt(maskPattern, i, j) {
  * @param  {Number}    pattern Pattern reference number
  * @param  {BitMatrix} data    BitMatrix data
  */
-exports.applyMask = function applyMask(pattern, data) {
-	const size = data.size;
+export function applyMask(maskPattern: number, bitMatrix: BitMatrix) {
+	const size = bitMatrix.size;
 
 	for (let col = 0; col < size; col++) {
 		for (let row = 0; row < size; row++) {
-			if (data.isReserved(row, col)) continue;
-			data.xor(row, col, getMaskAt(pattern, row, col));
+			if (bitMatrix.isReserved(row, col)) continue;
+			bitMatrix.xor(row, col, getMaskAt(maskPattern, row, col));
 		}
 	}
-};
+}
 
 /**
  * Returns the best mask pattern for data
  *
- * @param  {BitMatrix} data
+ * @param  {BitMatrix} bitMatrix
  * @return {Number} Mask pattern reference number
  */
-exports.getBestMask = function getBestMask(data, setupFormatFunc) {
-	const numPatterns = Object.keys(exports.Patterns).length;
+export function getBestMask(
+	bitMatrix: BitMatrix,
+	setupFormatFunc: (maskPattern: number) => void
+): number {
+	const numPatterns = Object.keys(Patterns).length;
 	let bestPattern = 0;
 	let lowerPenalty = Infinity;
 
 	for (let p = 0; p < numPatterns; p++) {
 		setupFormatFunc(p);
-		exports.applyMask(p, data);
+		applyMask(p, bitMatrix);
 
 		// Calculate penalty
 		const penalty =
-			exports.getPenaltyN1(data) +
-			exports.getPenaltyN2(data) +
-			exports.getPenaltyN3(data) +
-			exports.getPenaltyN4(data);
+			getPenaltyN1(bitMatrix) +
+			getPenaltyN2(bitMatrix) +
+			getPenaltyN3(bitMatrix) +
+			getPenaltyN4(bitMatrix);
 
 		// Undo previously applied mask
-		exports.applyMask(p, data);
+		applyMask(p, bitMatrix);
 
 		if (penalty < lowerPenalty) {
 			lowerPenalty = penalty;
@@ -241,4 +250,4 @@ exports.getBestMask = function getBestMask(data, setupFormatFunc) {
 	}
 
 	return bestPattern;
-};
+}

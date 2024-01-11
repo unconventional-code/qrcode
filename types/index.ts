@@ -4,8 +4,8 @@ import {
 	QRCodeErrorCorrectionLevel,
 } from '../lib/core/error-correction-level';
 import { Mode } from '../lib/core/mode';
+import { QRCodeMaskPattern } from '../lib/core/mask-pattern';
 
-export type QRCodeMaskPattern = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type QRCodeToSJISFunc = (codePoint: string) => number;
 
 export interface QRCodeOptions {

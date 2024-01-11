@@ -1,6 +1,6 @@
 import * as FormatInfo from '../../../lib/core/format-info';
 import * as ECLevel from '../../../lib/core/error-correction-level';
-import MaskPattern from '../../../lib/core/mask-pattern';
+import * as MaskPattern from '../../../lib/core/mask-pattern';
 
 const EXPECTED_FORMAT_BITS = [
 	[0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976],
