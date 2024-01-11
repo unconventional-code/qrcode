@@ -1,4 +1,4 @@
-import GF from '../../../lib/core/galois-field';
+import * as GF from '../../../lib/core/galois-field';
 
 describe('Galois Field', () => {
 	it('should throw for log(n) with n < 1', () => {
