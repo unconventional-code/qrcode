@@ -1,21 +1,85 @@
-const Mode = require('./mode');
-const NumericData = require('./numeric-data');
-const AlphanumericData = require('./alphanumeric-data');
-const ByteData = require('./byte-data');
-const KanjiData = require('./kanji-data');
-const StructuredAppendData = require('./structured-append-data');
-const Regex = require('./regex');
-const Utils = require('./utils');
-const dijkstra = require('dijkstrajs');
+// @ts-nocheck
+import * as Mode from './mode';
+import NumericData from './numeric-data';
+import AlphanumericData from './alphanumeric-data';
+import ByteData from './byte-data';
+import KanjiData from './kanji-data';
+import StructuredAppendData from './structured-append-data';
+import * as Regex from './regex';
+import * as Utils from './utils';
+import dijkstra from 'dijkstrajs';
+
+export interface DataSegment {
+	getLength(): number;
+	getBitsLength(): number;
+}
+
+// export interface NumericData extends DataSegment {
+// 	mode: Mode.Mode<'Numeric'>;
+// 	data: string;
+// }
+
+// export interface AlphanumericData extends DataSegment {
+// 	mode: Mode.Mode<'Alphanumeric'>;
+// 	data: string;
+// }
+
+// export interface ByteData extends DataSegment {
+// 	mode: Mode.Mode<'Byte'>;
+// 	data: Uint8Array;
+// }
+
+// export interface KanjiData extends DataSegment {
+// 	mode: Mode.Mode<'Kanji'>;
+// 	data: string;
+// }
+
+export interface QRCodeNumericSegment {
+	mode: 'numeric';
+	data: string | number;
+}
+
+export interface QRCodeAlphanumericSegment {
+	mode: 'alphanumeric';
+	data: string;
+}
+
+export interface QRCodeByteSegment {
+	mode: 'byte';
+	data: Buffer | Uint8ClampedArray | Uint8Array;
+}
+
+export interface QRCodeKanjiSegment {
+	mode: 'kanji';
+	data: string;
+}
+
+export type QRCodeSegmentMode = 'alphanumeric' | 'numeric' | 'byte' | 'kanji' | 'structuredappend';
+
+export type QRCodeSegment = {
+	mode: Mode.Mode;
+	data: string | Buffer | Uint8ClampedArray | Uint8Array;
+	index?: number;
+	length?: number;
+};
+
+// | QRCodeNumericSegment
+// 	| QRCodeAlphanumericSegment
+// 	| QRCodeByteSegment
+// 	| QRCodeKanjiSegment
+// 	| {
+// 			mode?: never;
+// 			data: string | Buffer | Uint8ClampedArray | Uint8Array;
+// 	  };
 
 /**
  * Returns UTF8 byte length
  *
- * @param  {String} str Input string
+ * @param  {String} inputString Input string
  * @return {Number}     Number of byte
  */
-function getStringByteLength(str) {
-	return unescape(encodeURIComponent(str)).length;
+function getStringByteLength(inputString: string) {
+	return unescape(encodeURIComponent(inputString)).length;
 }
 
 /**
@@ -26,7 +90,7 @@ function getStringByteLength(str) {
  * @param  {String} str  String to process
  * @return {Array}       Array of object with segments data
  */
-function getSegments(regex, mode, str) {
+function getSegments(regex: RegExp, mode: Mode.Mode, str: string): QRCodeSegment[] {
 	const segments = [];
 	let result;
 
@@ -49,11 +113,11 @@ function getSegments(regex, mode, str) {
  * @param  {String} dataStr Input string
  * @return {Array}          Array of object with segments data
  */
-function getSegmentsFromString(dataStr) {
+function getSegmentsFromString(dataStr: string) {
 	const numSegs = getSegments(Regex.NUMERIC, Mode.NUMERIC, dataStr);
 	const alphaNumSegs = getSegments(Regex.ALPHANUMERIC, Mode.ALPHANUMERIC, dataStr);
-	let byteSegs;
-	let kanjiSegs;
+	let byteSegs: QRCodeSegment[];
+	let kanjiSegs: QRCodeSegment[];
 
 	if (Utils.isKanjiModeEnabled()) {
 		byteSegs = getSegments(Regex.BYTE, Mode.BYTE, dataStr);
@@ -63,6 +127,12 @@ function getSegmentsFromString(dataStr) {
 		kanjiSegs = [];
 	}
 
+	// console.log({
+	// 	byteSegs,
+	// 	kanjiSegs,
+	// 	alphaNumSegs,
+	// 	numSegs,
+	// });
 	const segs = numSegs.concat(alphaNumSegs, byteSegs, kanjiSegs);
 
 	return segs
@@ -86,18 +156,20 @@ function getSegmentsFromString(dataStr) {
  * @param  {Mode} mode     Segment mode
  * @return {Number}        Bit length
  */
-function getSegmentBitsLength(length, mode) {
+function getSegmentBitsLength(stringLength: number, mode: Mode.Mode) {
 	switch (mode) {
 		case Mode.NUMERIC:
-			return NumericData.getBitsLength(length);
+			return NumericData.getBitsLength(stringLength);
 		case Mode.ALPHANUMERIC:
-			return AlphanumericData.getBitsLength(length);
+			return AlphanumericData.getBitsLength(stringLength);
 		case Mode.KANJI:
-			return KanjiData.getBitsLength(length);
+			return KanjiData.getBitsLength(stringLength);
 		case Mode.BYTE:
-			return ByteData.getBitsLength(length);
-		case Mode.STRUCTUREDAPPEND:
-			return StructuredAppendData.getBitsLength(length);
+			return ByteData.getBitsLength(stringLength);
+		case Mode.STRUCTURED_APPEND:
+			return StructuredAppendData.getBitsLength();
+		default:
+			throw new Error('Invalid mode: ' + mode);
 	}
 }
 
@@ -107,8 +179,8 @@ function getSegmentBitsLength(length, mode) {
  * @param  {Array} segs Array of object with segments data
  * @return {Array}      Array of object with segments data
  */
-function mergeSegments(segs) {
-	return segs.reduce(function (acc, curr) {
+function mergeSegments(segs: QRCodeSegment[]) {
+	return segs.reduce(function (acc: QRCodeSegment[], curr) {
 		const prevSeg = acc.length - 1 >= 0 ? acc[acc.length - 1] : null;
 		if (prevSeg && prevSeg.mode === curr.mode) {
 			acc[acc.length - 1].data += curr.data;
@@ -136,7 +208,7 @@ function mergeSegments(segs) {
  * @param  {Array} segs Array of object with segments data
  * @return {Array}      Array of object with segments data
  */
-function buildNodes(segs) {
+function buildNodes(segs: QRCodeSegment[]) {
 	const nodes = [];
 	for (let i = 0; i < segs.length; i++) {
 		const seg = segs[i];
@@ -155,11 +227,13 @@ function buildNodes(segs) {
 			case Mode.KANJI:
 				nodes.push([
 					seg,
-					{ data: seg.data, mode: Mode.BYTE, length: getStringByteLength(seg.data) },
+					{ data: seg.data, mode: Mode.BYTE, length: getStringByteLength(seg.data.toString()) },
 				]);
 				break;
 			case Mode.BYTE:
-				nodes.push([{ data: seg.data, mode: Mode.BYTE, length: getStringByteLength(seg.data) }]);
+				nodes.push([
+					{ data: seg.data, mode: Mode.BYTE, length: getStringByteLength(seg.data.toString()) },
+				]);
 		}
 	}
 
@@ -178,15 +252,22 @@ function buildNodes(segs) {
  * @param  {Number} version QR Code version
  * @return {Object}         Graph of all possible segments
  */
-function buildGraph(nodes, version) {
-	const table = {};
-	const graph = { start: {} };
+function buildGraph(nodes: QRCodeSegment[][], qrCodeVersion: number) {
+	const table: Record<
+		string,
+		{
+			node: QRCodeSegment;
+			lastCount: number;
+		}
+	> = {};
+	const graph: Record<string, Record<string, number>> = { start: {} };
 	let prevNodeIds = ['start'];
 
 	for (let i = 0; i < nodes.length; i++) {
 		const nodeGroup = nodes[i];
 		const currentNodeIds = [];
 
+		// console.log({ nodeGroup });
 		for (let j = 0; j < nodeGroup.length; j++) {
 			const node = nodeGroup[j];
 			const key = '' + i + j;
@@ -208,7 +289,7 @@ function buildGraph(nodes, version) {
 					graph[prevNodeId][key] =
 						getSegmentBitsLength(node.length, node.mode) +
 						4 +
-						Mode.getCharCountIndicator(node.mode, version); // switch cost
+						Mode.getCharCountIndicator(node.mode, qrCodeVersion); // switch cost
 
 					table[key].lastCount = node.length;
 				}
@@ -233,8 +314,8 @@ function buildGraph(nodes, version) {
  * @param  {Mode | String} modesHint Data mode
  * @return {Segment}                 Segment
  */
-function buildSingleSegment(data, modesHint) {
-	let mode;
+function buildSingleSegment(data: string, modesHint: Mode.Mode | string) {
+	let mode: Mode.Mode | undefined;
 	const bestMode = Mode.getBestModeForData(data);
 
 	mode = Mode.from(modesHint, bestMode);
@@ -272,6 +353,9 @@ function buildSingleSegment(data, modesHint) {
 
 		case Mode.STRUCTURED_APPEND:
 			return new StructuredAppendData(data);
+
+		default:
+			throw new Error('Invalid mode: ' + mode);
 	}
 }
 
@@ -290,9 +374,11 @@ function buildSingleSegment(data, modesHint) {
  * @param  {Array} array Array of objects with segments data
  * @return {Array}       Array of Segments
  */
-exports.fromArray = function fromArray(array) {
+export function fromArray(array: QRCodeSegment[]) {
 	return array.reduce(function (acc, seg) {
+		console.log({ seg });
 		if (typeof seg === 'string') {
+			console.log('no way');
 			acc.push(buildSingleSegment(seg, null));
 		} else if (seg.data) {
 			acc.push(buildSingleSegment(seg.data, seg.mode));
@@ -300,7 +386,7 @@ exports.fromArray = function fromArray(array) {
 
 		return acc;
 	}, []);
-};
+}
 
 /**
  * Builds an optimized sequence of segments from a string,
@@ -310,20 +396,20 @@ exports.fromArray = function fromArray(array) {
  * @param  {Number} version QR Code version
  * @return {Array}          Array of segments
  */
-exports.fromString = function fromString(data, version) {
-	const segs = getSegmentsFromString(data, Utils.isKanjiModeEnabled());
+export function fromString(inputString: string, qrCodeVersion: number) {
+	const segs = getSegmentsFromString(inputString);
 
 	const nodes = buildNodes(segs);
-	const graph = buildGraph(nodes, version);
+	const graph = buildGraph(nodes, qrCodeVersion);
 	const path = dijkstra.find_path(graph.map, 'start', 'end');
 
-	const optimizedSegs = [];
+	const optimizedSegs: QRCodeSegment[] = [];
 	for (let i = 1; i < path.length - 1; i++) {
 		optimizedSegs.push(graph.table[path[i]].node);
 	}
 
-	return exports.fromArray(mergeSegments(optimizedSegs));
-};
+	return fromArray(mergeSegments(optimizedSegs));
+}
 
 /**
  * Splits a string in various segments with the modes which
@@ -335,6 +421,6 @@ exports.fromString = function fromString(data, version) {
  * @param  {string} data Input string
  * @return {Array}       Array of segments
  */
-exports.rawSplit = function rawSplit(data) {
-	return exports.fromArray(getSegmentsFromString(data, Utils.isKanjiModeEnabled()));
-};
+export function rawSplit(inputString: string) {
+	return fromArray(getSegmentsFromString(inputString));
+}
