@@ -2,7 +2,7 @@ import * as Utils from '../../../lib/core/utils';
 import Version from '../../../lib/core/version';
 import * as ECLevel from '../../../lib/core/error-correction-level';
 import * as ECCode from '../../../lib/core/error-correction-code';
-import Mode from '../../../lib/core/mode';
+import * as Mode from '../../../lib/core/mode';
 
 describe('Error correction codewords', () => {
 	const levels = [ECLevel.L, ECLevel.M, ECLevel.Q, ECLevel.H];

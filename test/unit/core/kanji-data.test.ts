@@ -1,6 +1,6 @@
 import BitBuffer from '../../../lib/core/bit-buffer';
 import KanjiData from '../../../lib/core/kanji-data';
-import Mode from '../../../lib/core/mode';
+import * as Mode from '../../../lib/core/mode';
 import toSJIS from '../../../helper/to-sjis';
 import { setToSJISFunction } from '../../../lib/core/utils';
 
@@ -13,7 +13,6 @@ describe('Kanji Data', () => {
 	const bitLength = 52; // length * 13
 
 	const dataBit = [57, 250, 134, 174, 129, 134, 0];
-
 
 	it('should be KANJI mode', () => {
 		const kanjiData = new KanjiData(data);

@@ -1,7 +1,7 @@
 import Version from '../../../lib/core/version';
 import * as VersionCheck from '../../../lib/core/version-check';
 import * as ECLevel from '../../../lib/core/error-correction-level';
-import Mode from '../../../lib/core/mode';
+import * as Mode from '../../../lib/core/mode';
 import NumericData from '../../../lib/core/numeric-data';
 import AlphanumericData from '../../../lib/core/alphanumeric-data';
 import KanjiData from '../../../lib/core/kanji-data';

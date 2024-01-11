@@ -3,6 +3,7 @@ import {
 	ErrorCorrectionLevel,
 	QRCodeErrorCorrectionLevel,
 } from '../lib/core/error-correction-level';
+import { Mode } from '../lib/core/mode';
 
 export type QRCodeMaskPattern = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type QRCodeToSJISFunc = (codePoint: string) => number;
@@ -268,13 +269,6 @@ export interface BitMatrix {
 	 * Check if bit at specified location is reserved.
 	 */
 	isReserved(row: number, col: number): number;
-}
-
-export type ModeId = 'Numeric' | 'Alphanumeric' | 'Byte' | 'Kanji';
-export interface Mode<TModeId extends ModeId = ModeId> {
-	id: TModeId;
-	bit: number;
-	ccBits: readonly number[];
 }
 
 export type GeneratedQRCodeSegment = NumericData | AlphanumericData | ByteData | KanjiData;

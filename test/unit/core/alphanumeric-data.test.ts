@@ -1,6 +1,6 @@
 import BitBuffer from '../../../lib/core/bit-buffer';
 import AlphanumericData from '../../../lib/core/alphanumeric-data';
-import Mode from '../../../lib/core/mode';
+import * as Mode from '../../../lib/core/mode';
 
 const testData = [
 	{
@@ -38,11 +38,9 @@ describe('Alphanumeric Data', () => {
 		});
 
 		it('should write correct data to buffer', () => {
-
-		const bitBuffer = new BitBuffer();
-		alphanumericData.write(bitBuffer);
-		expect(bitBuffer.buffer).toEqual(data.dataBit);
+			const bitBuffer = new BitBuffer();
+			alphanumericData.write(bitBuffer);
+			expect(bitBuffer.buffer).toEqual(data.dataBit);
 		});
 	});
-
 });

@@ -1,6 +1,6 @@
 import BitBuffer from '../../../lib/core/bit-buffer';
 import ByteData from '../../../lib/core/byte-data';
-import Mode from '../../../lib/core/mode';
+import * as Mode from '../../../lib/core/mode';
 
 describe('Byte Data: String Input', () => {
 	const text = '1234';

@@ -1,6 +1,6 @@
 import BitBuffer from '../../../lib/core/bit-buffer';
 import StructuredAppendData from '../../../lib/core/structured-append-data';
-import Mode from '../../../lib/core/mode';
+import * as Mode from '../../../lib/core/mode';
 
 describe('Structured Append Data', () => {
 	const data = { position: 0x1, total: 0x3, parity: 0x0a };

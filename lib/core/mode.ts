@@ -1,5 +1,12 @@
-const VersionCheck = require('./version-check');
-const Regex = require('./regex');
+import * as VersionCheck from './version-check';
+import * as Regex from './regex';
+
+export type ModeId = 'Numeric' | 'Alphanumeric' | 'Byte' | 'Kanji' | 'Structured Append';
+export interface Mode<TModeId extends ModeId = ModeId> {
+	id: TModeId;
+	bit: number;
+	ccBits: readonly number[];
+}
 
 /**
  * Numeric mode encodes data from the decimal digit set (0 - 9)
@@ -8,7 +15,7 @@ const Regex = require('./regex');
  *
  * @type {Object}
  */
-exports.NUMERIC = {
+export const NUMERIC: Mode = {
 	id: 'Numeric',
 	bit: 1 << 0,
 	ccBits: [10, 12, 14],
@@ -23,7 +30,7 @@ exports.NUMERIC = {
  *
  * @type {Object}
  */
-exports.ALPHANUMERIC = {
+export const ALPHANUMERIC: Mode = {
 	id: 'Alphanumeric',
 	bit: 1 << 1,
 	ccBits: [9, 11, 13],
@@ -34,7 +41,7 @@ exports.ALPHANUMERIC = {
  *
  * @type {Object}
  */
-exports.BYTE = {
+export const BYTE: Mode = {
 	id: 'Byte',
 	bit: 1 << 2,
 	ccBits: [8, 16, 16],
@@ -49,7 +56,7 @@ exports.BYTE = {
  *
  * @type {Object}
  */
-exports.KANJI = {
+export const KANJI: Mode = {
 	id: 'Kanji',
 	bit: 1 << 3,
 	ccBits: [8, 10, 12],
@@ -61,7 +68,7 @@ exports.KANJI = {
  *
  * @type {Object}
  */
-exports.MIXED = {
+export const MIXED = {
 	bit: -1,
 };
 
@@ -70,7 +77,7 @@ exports.MIXED = {
  * multiple QR codes. This segment is always a fixed size, so no
  * character count indicator is required.
  */
-exports.STRUCTURED_APPEND = {
+export const STRUCTURED_APPEND: Mode = {
 	id: 'Structured Append',
 	bit: (1 << 0) | (1 << 1),
 	ccBits: [0, 0, 0],
@@ -84,17 +91,17 @@ exports.STRUCTURED_APPEND = {
  * @param  {Number} version QR Code version
  * @return {Number}         Number of bits
  */
-exports.getCharCountIndicator = function getCharCountIndicator(mode, version) {
+export function getCharCountIndicator(mode: Mode, qrCodeVersion: number) {
 	if (!mode.ccBits) throw new Error('Invalid mode: ' + mode);
 
-	if (!VersionCheck.isValid(version)) {
-		throw new Error('Invalid version: ' + version);
+	if (!VersionCheck.isValid(qrCodeVersion)) {
+		throw new Error('Invalid version: ' + qrCodeVersion);
 	}
 
-	if (version >= 1 && version < 10) return mode.ccBits[0];
-	else if (version < 27) return mode.ccBits[1];
+	if (qrCodeVersion >= 1 && qrCodeVersion < 10) return mode.ccBits[0];
+	else if (qrCodeVersion < 27) return mode.ccBits[1];
 	return mode.ccBits[2];
-};
+}
 
 /**
  * Returns the most efficient mode to store the specified data
@@ -102,12 +109,16 @@ exports.getCharCountIndicator = function getCharCountIndicator(mode, version) {
  * @param  {String} dataStr Input data string
  * @return {Mode}           Best mode
  */
-exports.getBestModeForData = function getBestModeForData(dataStr) {
-	if (Regex.testNumeric(dataStr)) return exports.NUMERIC;
-	else if (Regex.testAlphanumeric(dataStr)) return exports.ALPHANUMERIC;
-	else if (Regex.testKanji(dataStr)) return exports.KANJI;
-	else return exports.BYTE;
-};
+export function getBestModeForData(dataStr: string) {
+	if (Regex.testNumeric(dataStr)) {
+		return NUMERIC;
+	} else if (Regex.testAlphanumeric(dataStr)) {
+		return ALPHANUMERIC;
+	} else if (Regex.testKanji(dataStr)) {
+		return KANJI;
+	}
+	return BYTE;
+}
 
 /**
  * Return mode name as string
@@ -115,10 +126,12 @@ exports.getBestModeForData = function getBestModeForData(dataStr) {
  * @param {Mode} mode Mode object
  * @returns {String}  Mode name
  */
-exports.toString = function toString(mode) {
-	if (mode && mode.id) return mode.id;
+export function toString(mode: Mode) {
+	if (mode && mode.id) {
+		return mode.id;
+	}
 	throw new Error('Invalid mode');
-};
+}
 
 /**
  * Check if input param is a valid mode object
@@ -126,9 +139,9 @@ exports.toString = function toString(mode) {
  * @param   {Mode}    mode Mode object
  * @returns {Boolean} True if valid mode, false otherwise
  */
-exports.isValid = function isValid(mode) {
-	return mode && mode.bit && mode.ccBits;
-};
+export function isValid(mode: Mode) {
+	return !!mode && !!mode.bit && !!mode.ccBits;
+}
 
 /**
  * Get mode object from its name
@@ -136,26 +149,26 @@ exports.isValid = function isValid(mode) {
  * @param   {String} string Mode name
  * @returns {Mode}          Mode object
  */
-function fromString(string) {
-	if (typeof string !== 'string') {
+function fromString(str: string) {
+	if (typeof str !== 'string') {
 		throw new Error('Param is not a string');
 	}
 
-	const lcStr = string.toLowerCase();
+	const lcStr = str.toLowerCase();
 
 	switch (lcStr) {
 		case 'numeric':
-			return exports.NUMERIC;
+			return NUMERIC;
 		case 'alphanumeric':
-			return exports.ALPHANUMERIC;
+			return ALPHANUMERIC;
 		case 'kanji':
-			return exports.KANJI;
+			return KANJI;
 		case 'byte':
-			return exports.BYTE;
+			return BYTE;
 		case 'structuredappend':
-			return exports.STRUCTURED_APPEND;
+			return STRUCTURED_APPEND;
 		default:
-			throw new Error('Unknown mode: ' + string);
+			throw new Error('Unknown mode: ' + str);
 	}
 }
 
@@ -167,14 +180,14 @@ function fromString(string) {
  * @param  {Mode}        defaultValue Fallback value
  * @return {Mode}                     Encoding mode
  */
-exports.from = function from(value, defaultValue) {
-	if (exports.isValid(value)) {
-		return value;
+export function from(value: Mode | string, defaultValue?: Mode): Mode | undefined {
+	if (exports.isValid(value as Mode)) {
+		return value as Mode;
 	}
 
 	try {
-		return fromString(value);
+		return fromString(value as string);
 	} catch (e) {
 		return defaultValue;
 	}
-};
+}

@@ -1,6 +1,6 @@
 import BitBuffer from '../../../lib/core/bit-buffer';
 import NumericData from '../../../lib/core/numeric-data';
-import Mode from '../../../lib/core/mode';
+import * as Mode from '../../../lib/core/mode';
 
 const testData = [
 	{
