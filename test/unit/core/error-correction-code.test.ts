@@ -1,6 +1,6 @@
 import * as Utils from '../../../lib/core/utils';
 import Version from '../../../lib/core/version';
-import ECLevel from '../../../lib/core/error-correction-level';
+import * as ECLevel from '../../../lib/core/error-correction-level';
 import ECCode from '../../../lib/core/error-correction-code';
 import Mode from '../../../lib/core/mode';
 
