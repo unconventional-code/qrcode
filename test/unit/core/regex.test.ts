@@ -1,4 +1,4 @@
-import Regex from '../../../lib/core/regex';
+import * as Regex from '../../../lib/core/regex';
 
 describe('Regex', () => {
 	it('should export a regex for NUMERIC', () => {
