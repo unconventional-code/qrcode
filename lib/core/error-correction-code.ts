@@ -1,4 +1,4 @@
-const ECLevel = require('./error-correction-level');
+import * as ECLevel from './error-correction-level';
 
 const EC_BLOCKS_TABLE = [
 	// L  M  Q  H
@@ -27,11 +27,12 @@ const EC_CODEWORDS_TABLE = [
  * Returns the number of error correction block that the QR Code should contain
  * for the specified version and error correction level.
  *
- * @param  {Number} version              QR Code version
- * @param  {Number} errorCorrectionLevel Error correction level
- * @return {Number}                      Number of error correction blocks
+ * @return Number of error correction blocks
  */
-exports.getBlocksCount = function getBlocksCount(version, errorCorrectionLevel) {
+export function getBlocksCount(
+	version: number,
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel
+): number | undefined {
 	switch (errorCorrectionLevel) {
 		case ECLevel.L:
 			return EC_BLOCKS_TABLE[(version - 1) * 4 + 0];
@@ -44,17 +45,18 @@ exports.getBlocksCount = function getBlocksCount(version, errorCorrectionLevel) 
 		default:
 			return undefined;
 	}
-};
+}
 
 /**
  * Returns the number of error correction codewords to use for the specified
  * version and error correction level.
  *
- * @param  {Number} version              QR Code version
- * @param  {Number} errorCorrectionLevel Error correction level
- * @return {Number}                      Number of error correction codewords
+ * @return Number of error correction codewords
  */
-exports.getTotalCodewordsCount = function getTotalCodewordsCount(version, errorCorrectionLevel) {
+export function getTotalCodewordsCount(
+	version: number,
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel
+): number | undefined {
 	switch (errorCorrectionLevel) {
 		case ECLevel.L:
 			return EC_CODEWORDS_TABLE[(version - 1) * 4 + 0];
@@ -67,4 +69,4 @@ exports.getTotalCodewordsCount = function getTotalCodewordsCount(version, errorC
 		default:
 			return undefined;
 	}
-};
+}

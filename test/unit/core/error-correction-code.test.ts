@@ -1,7 +1,7 @@
 import * as Utils from '../../../lib/core/utils';
 import Version from '../../../lib/core/version';
 import * as ECLevel from '../../../lib/core/error-correction-level';
-import ECCode from '../../../lib/core/error-correction-code';
+import * as ECCode from '../../../lib/core/error-correction-code';
 import Mode from '../../../lib/core/mode';
 
 describe('Error correction codewords', () => {
@@ -24,7 +24,9 @@ describe('Error correction codewords', () => {
 	});
 
 	it('should return undefined if EC level is not specified', () => {
-		expect(ECCode.getTotalCodewordsCount(1, undefined as unknown as number)).toBeUndefined();
+		expect(
+			ECCode.getTotalCodewordsCount(1, undefined as unknown as ECLevel.ErrorCorrectionLevel)
+		).toBeUndefined();
 	});
 });
 
@@ -41,6 +43,8 @@ describe('Error correction blocks', () => {
 	});
 
 	it('should return undefined if EC level is not specified', () => {
-		expect(ECCode.getBlocksCount(1, undefined as unknown as number)).toBeUndefined();
+		expect(
+			ECCode.getBlocksCount(1, undefined as unknown as ECLevel.ErrorCorrectionLevel)
+		).toBeUndefined();
 	});
 });
