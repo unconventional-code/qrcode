@@ -1,16 +1,9 @@
-/// <reference types="node" />
-
 import * as stream from 'stream';
+import {
+	ErrorCorrectionLevel,
+	QRCodeErrorCorrectionLevel,
+} from '../lib/core/error-correction-level';
 
-export type QRCodeErrorCorrectionLevel =
-	| 'low'
-	| 'medium'
-	| 'quartile'
-	| 'high'
-	| 'L'
-	| 'M'
-	| 'Q'
-	| 'H';
 export type QRCodeMaskPattern = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type QRCodeToSJISFunc = (codePoint: string) => number;
 
@@ -275,10 +268,6 @@ export interface BitMatrix {
 	 * Check if bit at specified location is reserved.
 	 */
 	isReserved(row: number, col: number): number;
-}
-
-export interface ErrorCorrectionLevel {
-	bit: 0 | 1 | 2 | 3;
 }
 
 export type ModeId = 'Numeric' | 'Alphanumeric' | 'Byte' | 'Kanji';
