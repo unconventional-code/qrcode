@@ -13,63 +13,16 @@ export interface DataSegment {
 	getBitsLength(): number;
 }
 
-// export interface NumericData extends DataSegment {
-// 	mode: Mode.Mode<'Numeric'>;
-// 	data: string;
-// }
-
-// export interface AlphanumericData extends DataSegment {
-// 	mode: Mode.Mode<'Alphanumeric'>;
-// 	data: string;
-// }
-
-// export interface ByteData extends DataSegment {
-// 	mode: Mode.Mode<'Byte'>;
-// 	data: Uint8Array;
-// }
-
-// export interface KanjiData extends DataSegment {
-// 	mode: Mode.Mode<'Kanji'>;
-// 	data: string;
-// }
-
-export interface QRCodeNumericSegment {
-	mode: 'numeric';
-	data: string | number;
-}
-
-export interface QRCodeAlphanumericSegment {
-	mode: 'alphanumeric';
-	data: string;
-}
-
-export interface QRCodeByteSegment {
-	mode: 'byte';
-	data: Buffer | Uint8ClampedArray | Uint8Array;
-}
-
-export interface QRCodeKanjiSegment {
-	mode: 'kanji';
-	data: string;
-}
+type SegmentData = ByteData | NumericData | AlphanumericData | KanjiData | StructuredAppendData;
 
 export type QRCodeSegmentMode = 'alphanumeric' | 'numeric' | 'byte' | 'kanji' | 'structuredappend';
 
 export type QRCodeSegment = {
 	mode: Mode.Mode;
-	data: string | Buffer | Uint8ClampedArray | Uint8Array;
-	index?: number;
-	length?: number;
+	data: string;
+	index: number;
+	length: number;
 };
-
-// | QRCodeNumericSegment
-// 	| QRCodeAlphanumericSegment
-// 	| QRCodeByteSegment
-// 	| QRCodeKanjiSegment
-// 	| {
-// 			mode?: never;
-// 			data: string | Buffer | Uint8ClampedArray | Uint8Array;
-// 	  };
 
 /**
  * Returns UTF8 byte length
@@ -126,25 +79,18 @@ function getSegmentsFromString(dataStr: string) {
 		kanjiSegs = [];
 	}
 
-	// console.log({
-	// 	byteSegs,
-	// 	kanjiSegs,
-	// 	alphaNumSegs,
-	// 	numSegs,
-	// });
 	const segs = numSegs.concat(alphaNumSegs, byteSegs, kanjiSegs);
 
-	return segs
-		.sort(function (s1, s2) {
-			return s1.index - s2.index;
-		})
-		.map(function (obj) {
-			return {
-				data: obj.data,
-				mode: obj.mode,
-				length: obj.length,
-			};
-		});
+	return segs.sort(function (s1, s2) {
+		return s1.index - s2.index;
+	});
+	// .map(function (obj) {
+	// 	return {
+	// 		data: obj.data,
+	// 		mode: obj.mode,
+	// 		length: obj.length,
+	// 	};
+	// });
 }
 
 /**
@@ -266,7 +212,6 @@ function buildGraph(nodes: QRCodeSegment[][], qrCodeVersion: number) {
 		const nodeGroup = nodes[i];
 		const currentNodeIds = [];
 
-		// console.log({ nodeGroup });
 		for (let j = 0; j < nodeGroup.length; j++) {
 			const node = nodeGroup[j];
 			const key = '' + i + j;
@@ -313,11 +258,10 @@ function buildGraph(nodes: QRCodeSegment[][], qrCodeVersion: number) {
  * @param  {Mode | String} modesHint Data mode
  * @return {Segment}                 Segment
  */
-function buildSingleSegment(data: string, modesHint: Mode.Mode | string) {
-	let mode: Mode.Mode | undefined;
+function buildSingleSegment(data: string, modesHint: Mode.Mode | string | undefined): SegmentData {
 	const bestMode = Mode.getBestModeForData(data);
 
-	mode = Mode.from(modesHint, bestMode);
+	let mode = Mode.from(modesHint!, bestMode);
 
 	// Make sure data can be encoded
 	if (mode !== Mode.BYTE && mode !== Mode.STRUCTURED_APPEND && mode.bit < bestMode.bit) {
@@ -373,11 +317,9 @@ function buildSingleSegment(data: string, modesHint: Mode.Mode | string) {
  * @param  {Array} array Array of objects with segments data
  * @return {Array}       Array of Segments
  */
-export function fromArray(array: (QRCodeSegment | string)[]) {
-	return array.reduce(function (acc, seg) {
-		console.log({ seg });
+export function fromArray(array: (QRCodeSegment | string)[]): SegmentData[] {
+	return array.reduce(function (acc: SegmentData[], seg) {
 		if (typeof seg === 'string') {
-			console.log('no way');
 			acc.push(buildSingleSegment(seg, null));
 		} else if (seg.data) {
 			acc.push(buildSingleSegment(seg.data, seg.mode));
@@ -420,6 +362,6 @@ export function fromString(inputString: string, qrCodeVersion: number) {
  * @param  {string} data Input string
  * @return {Array}       Array of segments
  */
-export function rawSplit(inputString: string) {
+export function rawSplit(inputString: string): SegmentData[] {
 	return fromArray(getSegmentsFromString(inputString));
 }

@@ -181,7 +181,7 @@ function fromString(str: string) {
  * @return {Mode}                     Encoding mode
  */
 export function from(value: Mode | string, defaultValue: Mode = BYTE): Mode {
-	if (exports.isValid(value as Mode)) {
+	if (isValid(value as Mode)) {
 		return value as Mode;
 	}
 

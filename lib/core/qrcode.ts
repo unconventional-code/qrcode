@@ -387,7 +387,6 @@ function createSymbol(data, version, errorCorrectionLevel, maskPattern) {
 
 		if (!estimatedVersion) {
 			const rawSegments = Segments.rawSplit(data);
-
 			// Estimate best version that can contain raw splitted segments
 			estimatedVersion = Version.getBestVersionForData(rawSegments, errorCorrectionLevel);
 		}
