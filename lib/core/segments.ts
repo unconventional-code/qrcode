@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Mode from './mode';
 import NumericData from './numeric-data';
 import AlphanumericData from './alphanumeric-data';
@@ -124,9 +125,15 @@ function getSegmentBitsLength(stringLength: number, mode: Mode.Mode) {
  * @param  {Array} segs Array of object with segments data
  * @return {Array}      Array of object with segments data
  */
-function mergeSegments(segs: QRCodeSegment[]) {
-	return segs.reduce(function (acc: QRCodeSegment[], curr) {
+function mergeSegments(segs: GraphSegment[]) {
+	return segs.reduce(function (acc: GraphSegment[], curr) {
 		const prevSeg = acc.length - 1 >= 0 ? acc[acc.length - 1] : null;
+
+		if (curr.mode.bit === Mode.STRUCTURED_APPEND.bit) {
+			console.log({
+				curr,
+			});
+		}
 		if (prevSeg && prevSeg.mode === curr.mode) {
 			acc[acc.length - 1].data += curr.data;
 			return acc;
@@ -185,6 +192,18 @@ function buildNodes(segs: QRCodeSegment[]) {
 	return nodes;
 }
 
+type StructuredAppendDataPayload = {
+	position: number;
+	total: number;
+	parity: number;
+};
+
+type GraphSegment = {
+	data: string | StructuredAppendDataPayload;
+	mode: Mode.Mode;
+	length: number;
+};
+
 /**
  * Builds a graph from a list of nodes.
  * All segments in each node group will be connected with all the segments of
@@ -197,11 +216,11 @@ function buildNodes(segs: QRCodeSegment[]) {
  * @param  {Number} version QR Code version
  * @return {Object}         Graph of all possible segments
  */
-function buildGraph(nodes: QRCodeSegment[][], qrCodeVersion: number) {
+function buildGraph(nodes: GraphSegment[][], qrCodeVersion: number) {
 	const table: Record<
 		string,
 		{
-			node: QRCodeSegment;
+			node: GraphSegment;
 			lastCount: number;
 		}
 	> = {};
@@ -317,7 +336,7 @@ function buildSingleSegment(data: string, modesHint: Mode.Mode | string | undefi
  * @param  {Array} array Array of objects with segments data
  * @return {Array}       Array of Segments
  */
-export function fromArray(array: (QRCodeSegment | string)[]): SegmentData[] {
+export function fromArray(array: (GraphSegment | string)[]): SegmentData[] {
 	return array.reduce(function (acc: SegmentData[], seg) {
 		if (typeof seg === 'string') {
 			acc.push(buildSingleSegment(seg, null));
@@ -344,7 +363,7 @@ export function fromString(inputString: string, qrCodeVersion: number) {
 	const graph = buildGraph(nodes, qrCodeVersion);
 	const path = dijkstra.find_path(graph.map, 'start', 'end');
 
-	const optimizedSegs: QRCodeSegment[] = [];
+	const optimizedSegs: GraphSegment[] = [];
 	for (let i = 1; i < path.length - 1; i++) {
 		optimizedSegs.push(graph.table[path[i]].node);
 	}
