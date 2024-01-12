@@ -1,4 +1,4 @@
-import { QRCodeOptions } from '../core/qrcode';
+import { QRCode, QRCodeOptions } from '../core/qrcode';
 
 export type QRCodeDataURLType = 'image/png' | 'image/jpeg' | 'image/webp';
 export type QRCodeStringType = 'utf8' | 'svg' | 'terminal';
@@ -156,11 +156,7 @@ export interface QRCodeToBufferOptions extends QRCodeRenderersOptions {
 		| undefined;
 }
 
-function hex2rgba(hex) {
-	if (typeof hex === 'number') {
-		hex = hex.toString();
-	}
-
+function hex2rgba(hex: string) {
 	if (typeof hex !== 'string') {
 		throw new Error('Color should be defined as hex string');
 	}
@@ -194,7 +190,7 @@ function hex2rgba(hex) {
 	};
 }
 
-export type OPTIONS =
+export type QRCodeOptionsInput =
 	| QRCodeToDataURLOptionsJpegWebp
 	| QRCodeToDataURLOptionsOther
 	| QRCodeToStringOptionsTerminal
@@ -204,7 +200,21 @@ export type OPTIONS =
 	| QRCodeToFileStreamOptions
 	| QRCodeToBufferOptions;
 
-export function getOptions(options: OPTIONS) {
+export type QRCodeOptionsOutput = Omit<QRCodeOptionsInput, 'color'> & {
+	scale: number;
+	margin: number;
+	color: {
+		dark: ReturnType<typeof hex2rgba>;
+		light: ReturnType<typeof hex2rgba>;
+	};
+	rendererOpts:
+		| QRCodeToDataURLOptionsJpegWebp['rendererOpts']
+		| QRCodeToFileOptionsPng['rendererOpts']
+		| QRCodeToFileStreamOptions['rendererOpts']
+		| QRCodeToBufferOptions['rendererOpts']
+		| {};
+};
+export function getOptions(options: QRCodeOptionsInput): QRCodeOptionsOutput {
 	if (!options) options = {};
 	if (!options.color) options.color = {};
 
@@ -225,25 +235,47 @@ export function getOptions(options: OPTIONS) {
 			light: hex2rgba(options.color.light || '#ffffffff'),
 		},
 		type: options.type,
-		rendererOpts: 'rendererOpts' in options ? options.rendererOpts : undefined,
+		rendererOpts: 'rendererOpts' in options ? options.rendererOpts : {},
 	};
 }
 
-export function getScale(qrSize, opts) {
-	return opts.width && opts.width >= qrSize + opts.margin * 2
-		? opts.width / (qrSize + opts.margin * 2)
-		: opts.scale;
+type GetScaleInput = {
+	/**
+	 * Define how much wide the quiet zone should be.
+	 * @default 4
+	 */
+	margin?: number | undefined;
+	/**
+	 * Scale factor. A value of `1` means 1px per modules (black dots).
+	 * @default 4
+	 */
+	scale?: number | undefined;
+	/**
+	 * Forces a specific width for the output image.
+	 * If width is too small to contain the qr symbol, this option will be ignored.
+	 * Takes precedence over `scale`.
+	 */
+	width?: number | undefined;
+};
+
+export function getScale(qrSize: number, { width, scale = 4, margin = 4 }: GetScaleInput) {
+	return width && width >= qrSize + margin * 2 ? width / (qrSize + margin * 2) : scale;
 }
 
-export function getImageWidth(qrSize, opts) {
-	const scale = exports.getScale(qrSize, opts);
-	return Math.floor((qrSize + opts.margin * 2) * scale);
+type GetImageWidthInput = GetScaleInput;
+
+export function getImageWidth(
+	qrSize: number,
+	{ width, scale: _scale = 4, margin = 4 }: GetImageWidthInput
+) {
+	const scale = getScale(qrSize, { width, scale: _scale, margin });
+	return Math.floor((qrSize + margin * 2) * scale);
 }
 
-export function qrToImageData(imgData, qr, opts) {
+export function qrToImageData(imgData: unknown[], qr: QRCode, opts: QRCodeOptionsOutput) {
 	const size = qr.modules.size;
 	const data = qr.modules.data;
-	const scale = exports.getScale(size, opts);
+	const scale = getScale(size, opts);
 	const symbolSize = Math.floor((size + opts.margin * 2) * scale);
 	const scaledMargin = opts.margin * scale;
 	const palette = [opts.color.light, opts.color.dark];

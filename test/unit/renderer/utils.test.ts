@@ -1,3 +1,6 @@
+import BitMatrix from '../../../lib/core/bit-matrix';
+import { L } from '../../../lib/core/error-correction-level';
+import { QRCode } from '../../../lib/core/qrcode';
 import * as Utils from '../../../lib/renderer/utils';
 
 describe('Utils getOptions', () => {
@@ -19,7 +22,9 @@ describe('Utils getOptions', () => {
 
 	it('should return default options if called without param', () => {
 		// deepEqual
-		expect(Utils.getOptions()).toEqual(defaultOptions);
+		expect(Utils.getOptions(undefined as unknown as Utils.QRCodeOptionsInput)).toEqual(
+			defaultOptions
+		);
 	});
 
 	it('should return correct scale value', () => {
@@ -31,7 +36,7 @@ describe('Utils getOptions', () => {
 	});
 
 	it('should return default margin if specified value is null', () => {
-		expect(Utils.getOptions({ margin: null }).margin).toEqual(4);
+		expect(Utils.getOptions({ margin: undefined }).margin).toEqual(4);
 	});
 
 	it('should return default margin if specified value is < 0', () => {
@@ -49,15 +54,8 @@ describe('Utils getOptions', () => {
 		});
 	});
 
-	it('should return correct colors value from numbers', () => {
-		expect(Utils.getOptions({ color: { dark: 111, light: 999 } }).color).toEqual({
-			dark: { r: 17, g: 17, b: 17, a: 255, hex: '#111111' },
-			light: { r: 153, g: 153, b: 153, a: 255, hex: '#999999' },
-		});
-	});
-
 	it('should throw if color is not a string', () => {
-		expect(() => Utils.getOptions({ color: { dark: true } })).toThrow();
+		expect(() => Utils.getOptions({ color: { dark: true as unknown as string } })).toThrow();
 	});
 
 	it('should throw if color is not in a valid hex format', () => {
@@ -102,11 +100,15 @@ describe('Utils qrToImageData', () => {
 		expect(Utils.qrToImageData).toBeDefined();
 	});
 
-	const sampleQrData = {
+	const sampleQrData: QRCode = {
 		modules: {
 			data: [1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
 			size: 4,
-		},
+		} as unknown as BitMatrix,
+		version: 1,
+		segments: [],
+		maskPattern: 0,
+		errorCorrectionLevel: L,
 	};
 
 	const margin = 4;
@@ -114,14 +116,15 @@ describe('Utils qrToImageData', () => {
 	const width = 100;
 
 	const color = {
-		dark: { r: 255, g: 255, b: 255, a: 255 },
-		light: { r: 0, g: 0, b: 0, a: 255 },
+		dark: { r: 255, g: 255, b: 255, a: 255, hex: '#ffffffff' },
+		light: { r: 0, g: 0, b: 0, a: 255, hex: '#000000ff' },
 	};
 
-	const opts: any = {
+	const opts: Utils.QRCodeOptionsOutput = {
 		margin: margin,
 		scale: scale,
 		color: color,
+		rendererOpts: {},
 	};
 
 	let imageData: unknown[] = [];
