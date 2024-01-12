@@ -1,6 +1,6 @@
 // @ts-nocheck
 import * as ECLevel from '../../../lib/core/error-correction-level';
-import Version from '../../../lib/core/version';
+import * as Version from '../../../lib/core/version';
 import * as QRCode from '../../../lib/core/qrcode';
 import toSJIS from '../../../helper/to-sjis';
 

@@ -1,4 +1,4 @@
-import Version from '../../../lib/core/version';
+import * as Version from '../../../lib/core/version';
 import * as VersionCheck from '../../../lib/core/version-check';
 import * as ECLevel from '../../../lib/core/error-correction-level';
 import * as Mode from '../../../lib/core/mode';

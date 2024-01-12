@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Utils from './utils';
 import * as ECCode from './error-correction-code';
 import * as ECLevel from './error-correction-level';
