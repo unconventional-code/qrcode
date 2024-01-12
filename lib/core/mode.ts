@@ -70,7 +70,7 @@ export const KANJI: Mode = {
  */
 export const MIXED = {
 	bit: -1,
-};
+} as Mode;
 
 /**
  * Structured append mode contains information about a sequence of

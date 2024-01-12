@@ -3,6 +3,6 @@
  *
  * @return {Boolean} true if valid version, false otherwise
  */
-export function isValid(qrCodeVersion: number) {
-	return !isNaN(qrCodeVersion) && qrCodeVersion >= 1 && qrCodeVersion <= 40;
+export function isValid(qrCodeVersion: number | undefined) {
+	return !!qrCodeVersion && !isNaN(qrCodeVersion) && qrCodeVersion >= 1 && qrCodeVersion <= 40;
 }

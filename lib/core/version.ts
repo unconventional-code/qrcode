@@ -1,9 +1,9 @@
-// @ts-nocheck
 import * as Utils from './utils';
 import * as ECCode from './error-correction-code';
 import * as ECLevel from './error-correction-level';
 import * as Mode from './mode';
 import * as VersionCheck from './version-check';
+import { SegmentData } from './segments';
 
 // Generator polynomial used to encode version information
 const G18 =
@@ -29,7 +29,7 @@ function getReservedBitsCount(mode: Mode.Mode, qrCodeVersion: number) {
 	return Mode.getCharCountIndicator(mode, qrCodeVersion) + 4;
 }
 
-function getTotalBitsFromDataArray(segments, qrCodeVersion: number) {
+function getTotalBitsFromDataArray(segments: SegmentData[], qrCodeVersion: number) {
 	let totalBits = 0;
 
 	segments.forEach(function (data) {
@@ -40,7 +40,10 @@ function getTotalBitsFromDataArray(segments, qrCodeVersion: number) {
 	return totalBits;
 }
 
-function getBestVersionForMixedData(segments, errorCorrectionLevel: ECLevel.ErrorCorrectionLevel) {
+function getBestVersionForMixedData(
+	segments: SegmentData[],
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel
+) {
 	for (let currentVersion = 1; currentVersion <= 40; currentVersion++) {
 		const length = getTotalBitsFromDataArray(segments, currentVersion);
 		if (length <= getCapacity(currentVersion, errorCorrectionLevel, Mode.MIXED)) {
@@ -61,7 +64,7 @@ function getBestVersionForMixedData(segments, errorCorrectionLevel: ECLevel.Erro
  */
 export function from(qrCodeVersion: number | undefined, defaultValue?: number) {
 	if (VersionCheck.isValid(qrCodeVersion)) {
-		return parseInt(qrCodeVersion, 10);
+		return qrCodeVersion;
 	}
 
 	return defaultValue;
@@ -131,7 +134,7 @@ export function getCapacity(
  * @return {Number}                          QR Code version
  */
 export function getBestVersionForData(
-	data,
+	data: SegmentData[],
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel = ECLevel.M
 ) {
 	let seg;
