@@ -32,7 +32,7 @@ const EC_CODEWORDS_TABLE = [
 export function getBlocksCount(
 	version: number,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel
-): number | undefined {
+): number {
 	switch (errorCorrectionLevel) {
 		case ECLevel.L:
 			return EC_BLOCKS_TABLE[(version - 1) * 4 + 0];
@@ -43,7 +43,7 @@ export function getBlocksCount(
 		case ECLevel.H:
 			return EC_BLOCKS_TABLE[(version - 1) * 4 + 3];
 		default:
-			return undefined;
+			throw new Error('Invalid error correction level');
 	}
 }
 
@@ -56,7 +56,7 @@ export function getBlocksCount(
 export function getTotalCodewordsCount(
 	version: number,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel
-): number | undefined {
+): number {
 	switch (errorCorrectionLevel) {
 		case ECLevel.L:
 			return EC_CODEWORDS_TABLE[(version - 1) * 4 + 0];
@@ -67,6 +67,6 @@ export function getTotalCodewordsCount(
 		case ECLevel.H:
 			return EC_CODEWORDS_TABLE[(version - 1) * 4 + 3];
 		default:
-			return undefined;
+			throw new Error('Invalid error correction level');
 	}
 }

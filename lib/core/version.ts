@@ -16,7 +16,7 @@ function getBestVersionForDataLength(
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel
 ) {
 	for (let currentVersion = 1; currentVersion <= 40; currentVersion++) {
-		if (length <= exports.getCapacity(currentVersion, errorCorrectionLevel, mode)) {
+		if (length <= getCapacity(currentVersion, errorCorrectionLevel, mode)) {
 			return currentVersion;
 		}
 	}
@@ -43,7 +43,7 @@ function getTotalBitsFromDataArray(segments, qrCodeVersion: number) {
 function getBestVersionForMixedData(segments, errorCorrectionLevel: ECLevel.ErrorCorrectionLevel) {
 	for (let currentVersion = 1; currentVersion <= 40; currentVersion++) {
 		const length = getTotalBitsFromDataArray(segments, currentVersion);
-		if (length <= exports.getCapacity(currentVersion, errorCorrectionLevel, Mode.MIXED)) {
+		if (length <= getCapacity(currentVersion, errorCorrectionLevel, Mode.MIXED)) {
 			return currentVersion;
 		}
 	}
@@ -59,7 +59,7 @@ function getBestVersionForMixedData(segments, errorCorrectionLevel: ECLevel.Erro
  * @param  {Number}        defaultValue Fallback value
  * @return {Number}                     QR Code version number
  */
-export function from(qrCodeVersion: number, defaultValue = null) {
+export function from(qrCodeVersion: number, defaultValue?: number) {
 	if (VersionCheck.isValid(qrCodeVersion)) {
 		return parseInt(qrCodeVersion, 10);
 	}
@@ -86,7 +86,9 @@ export function getCapacity(
 	}
 
 	// Use Byte mode as default
-	if (typeof mode === 'undefined') mode = Mode.BYTE;
+	if (typeof mode === 'undefined') {
+		mode = Mode.BYTE;
+	}
 
 	// Total codewords for this QR code version (Data + Error correction)
 	const totalCodewords = Utils.getSymbolTotalCodewords(qrCodeVersion);
@@ -97,7 +99,9 @@ export function getCapacity(
 	// Total number of data codewords
 	const dataTotalCodewordsBits = (totalCodewords - ecTotalCodewords) * 8;
 
-	if (mode === Mode.MIXED) return dataTotalCodewordsBits;
+	if (mode === Mode.MIXED) {
+		return dataTotalCodewordsBits;
+	}
 
 	const usableBits = dataTotalCodewordsBits - getReservedBitsCount(mode, qrCodeVersion);
 
@@ -122,18 +126,19 @@ export function getCapacity(
  * Returns the minimum version needed to contain the amount of data
  *
  * @param  {Segment} data                    Segment of data
- * @param  {Number} [errorCorrectionLevel=H] Error correction level
+ * @param  {Number} [errorCorrectionLevel=M] Error correction level
  * @param  {Mode} mode                       Data mode
  * @return {Number}                          QR Code version
  */
-export function getBestVersionForData(data, errorCorrectionLevel: ECLevel.ErrorCorrectionLevel) {
+export function getBestVersionForData(
+	data,
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel = ECLevel.M
+) {
 	let seg;
-
-	const ecl = ECLevel.from(errorCorrectionLevel, ECLevel.M);
 
 	if (Array.isArray(data)) {
 		if (data.length > 1) {
-			return getBestVersionForMixedData(data, ecl);
+			return getBestVersionForMixedData(data, errorCorrectionLevel);
 		}
 
 		if (data.length === 0) {
@@ -145,7 +150,7 @@ export function getBestVersionForData(data, errorCorrectionLevel: ECLevel.ErrorC
 		seg = data;
 	}
 
-	return getBestVersionForDataLength(seg.mode, seg.getLength(), ecl);
+	return getBestVersionForDataLength(seg.mode, seg.getLength(), errorCorrectionLevel);
 }
 
 /**

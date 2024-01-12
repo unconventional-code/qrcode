@@ -13,20 +13,18 @@ describe('Error correction codewords', () => {
 			const reservedByte = Math.ceil((Mode.getCharCountIndicator(Mode.BYTE, v) + 4) / 8);
 
 			for (let l = 0; l < levels.length; l++) {
-				// @ts-ignore
 				const dataCodewords = Version.getCapacity(v, levels[l], Mode.BYTE) + reservedByte;
 
 				const expectedCodewords = totalCodewords - dataCodewords;
-				// @ts-ignore
 				expect(ECCode.getTotalCodewordsCount(v, levels[l])).toEqual(expectedCodewords);
 			}
 		}
 	});
 
-	it('should return undefined if EC level is not specified', () => {
-		expect(
+	it('should throw if EC level is not specified', () => {
+		expect(() =>
 			ECCode.getTotalCodewordsCount(1, undefined as unknown as ECLevel.ErrorCorrectionLevel)
-		).toBeUndefined();
+		).toThrow();
 	});
 });
 
@@ -36,15 +34,14 @@ describe('Error correction blocks', () => {
 	it('should return a positive number', () => {
 		for (let v = 1; v <= 40; v++) {
 			for (let l = 0; l < levels.length; l++) {
-				// @ts-ignore
 				expect(ECCode.getBlocksCount(v, levels[l])).toBeGreaterThan(0);
 			}
 		}
 	});
 
-	it('should return undefined if EC level is not specified', () => {
-		expect(
+	it('should throw an error if EC level is not specified', () => {
+		expect(() =>
 			ECCode.getBlocksCount(1, undefined as unknown as ECLevel.ErrorCorrectionLevel)
-		).toBeUndefined();
+		).toThrow();
 	});
 });
