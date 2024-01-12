@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Mode from './mode';
 import NumericData from './numeric-data';
 import AlphanumericData from './alphanumeric-data';
@@ -128,14 +127,8 @@ function getSegmentBitsLength(stringLength: number, mode: Mode.Mode) {
 function mergeSegments(segs: GraphSegment[]) {
 	return segs.reduce(function (acc: GraphSegment[], curr) {
 		const prevSeg = acc.length - 1 >= 0 ? acc[acc.length - 1] : null;
-
-		if (curr.mode.bit === Mode.STRUCTURED_APPEND.bit) {
-			console.log({
-				curr,
-			});
-		}
 		if (prevSeg && prevSeg.mode === curr.mode) {
-			acc[acc.length - 1].data += curr.data;
+			acc[acc.length - 1].data += curr.data as string;
 			return acc;
 		}
 
@@ -192,14 +185,8 @@ function buildNodes(segs: QRCodeSegment[]) {
 	return nodes;
 }
 
-type StructuredAppendDataPayload = {
-	position: number;
-	total: number;
-	parity: number;
-};
-
 type GraphSegment = {
-	data: string | StructuredAppendDataPayload;
+	data: string;
 	mode: Mode.Mode;
 	length: number;
 };
@@ -277,10 +264,10 @@ function buildGraph(nodes: GraphSegment[][], qrCodeVersion: number) {
  * @param  {Mode | String} modesHint Data mode
  * @return {Segment}                 Segment
  */
-function buildSingleSegment(data: string, modesHint: Mode.Mode | string | undefined): SegmentData {
+function buildSingleSegment(data: string, modesHint?: Mode.Mode | string): SegmentData {
 	const bestMode = Mode.getBestModeForData(data);
 
-	let mode = Mode.from(modesHint!, bestMode);
+	let mode = modesHint ? Mode.from(modesHint, bestMode) : bestMode;
 
 	// Make sure data can be encoded
 	if (mode !== Mode.BYTE && mode !== Mode.STRUCTURED_APPEND && mode.bit < bestMode.bit) {
@@ -314,7 +301,12 @@ function buildSingleSegment(data: string, modesHint: Mode.Mode | string | undefi
 			return new ByteData(data);
 
 		case Mode.STRUCTURED_APPEND:
-			return new StructuredAppendData(data);
+			// TODO: Add better support for structured append data
+			return new StructuredAppendData({
+				position: 0,
+				total: 0,
+				parity: 0,
+			});
 
 		default:
 			throw new Error('Invalid mode: ' + mode);
@@ -339,7 +331,7 @@ function buildSingleSegment(data: string, modesHint: Mode.Mode | string | undefi
 export function fromArray(array: (GraphSegment | string)[]): SegmentData[] {
 	return array.reduce(function (acc: SegmentData[], seg) {
 		if (typeof seg === 'string') {
-			acc.push(buildSingleSegment(seg, null));
+			acc.push(buildSingleSegment(seg));
 		} else if (seg.data) {
 			acc.push(buildSingleSegment(seg.data, seg.mode));
 		}
