@@ -1,9 +1,9 @@
 // @ts-nocheck
 import fs from 'fs';
 
-import { QRCodeToFileOptions } from '../../types';
 import { render } from './svg-tag';
 import { QRCodeSegment } from '../core/segments';
+import { QRCodeToFileOptions } from './utils';
 
 export { render };
 
