@@ -46,21 +46,13 @@ function fromString(string: QRCodeErrorCorrectionLevel) {
 	}
 }
 
-export function isValid(level?: ErrorCorrectionLevel) {
-	return !!level && typeof level.bit !== 'undefined' && level.bit >= 0 && level.bit < 4;
-}
-
 export function from(
-	value: ErrorCorrectionLevel | QRCodeErrorCorrectionLevel,
-	defaultValue?: ErrorCorrectionLevel
-) {
-	if (isValid(value as ErrorCorrectionLevel)) {
-		return value;
-	}
-
+	value?: QRCodeErrorCorrectionLevel,
+	defaultValue: QRCodeErrorCorrectionLevel = 'H'
+): ErrorCorrectionLevel {
 	try {
-		return fromString(value as QRCodeErrorCorrectionLevel);
+		return fromString(value ?? defaultValue);
 	} catch (e) {
-		return defaultValue;
+		return fromString(defaultValue);
 	}
 }

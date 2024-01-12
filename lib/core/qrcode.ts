@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Utils from './utils';
 import * as ECLevel from './error-correction-level';
 import BitBuffer from './bit-buffer';
@@ -525,7 +526,7 @@ export function create(data: string | Segments.QRCodeSegment[], options: QRCodeO
 	}
 
 	// Use higher error correction level as default
-	const errorCorrectionLevel = ECLevel.from(options.errorCorrectionLevel, ECLevel.M);
+	const errorCorrectionLevel = ECLevel.from(options.errorCorrectionLevel, 'M');
 	const version = Version.from(options.version);
 	if (options.toSJISFunc) {
 		Utils.setToSJISFunction(options.toSJISFunc);

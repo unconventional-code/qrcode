@@ -12,7 +12,7 @@ describe('QRCode interface', () => {
 
 	it('should throw if no data is provided', () => {
 		expect(() => {
-			QRCode.create();
+			QRCode.create(null as unknown as string);
 		}).toThrow();
 	});
 
@@ -62,17 +62,24 @@ describe('QRCode interface', () => {
 	});
 	it('should accept errorCorrectionLevel as string', () => {
 		expect(() => QRCode.create('AAAAA00000', { errorCorrectionLevel: 'quartile' })).not.toThrow();
-		expect(() => QRCode.create('AAAAA00000', { errorCorrectionLevel: 'q' })).not.toThrow();
+		expect(() =>
+			QRCode.create('AAAAA00000', {
+				errorCorrectionLevel: 'q' as ECLevel.QRCodeErrorCorrectionLevel,
+			})
+		).not.toThrow();
 	});
 });
 
 describe('QRCode error correction', () => {
 	let qr;
-	const ecValues = [
-		{ name: ['l', 'low'], level: ECLevel.L },
-		{ name: ['m', 'medium'], level: ECLevel.M },
-		{ name: ['q', 'quartile'], level: ECLevel.Q },
-		{ name: ['h', 'high'], level: ECLevel.H },
+	const ecValues: {
+		name: ECLevel.QRCodeErrorCorrectionLevel[];
+		level: ECLevel.ErrorCorrectionLevel;
+	}[] = [
+		{ name: ['L', 'low'], level: ECLevel.L },
+		{ name: ['M', 'medium'], level: ECLevel.M },
+		{ name: ['Q', 'quartile'], level: ECLevel.Q },
+		{ name: ['H', 'high'], level: ECLevel.H },
 	];
 
 	for (let l = 0; l < ecValues.length; l++) {
@@ -84,7 +91,9 @@ describe('QRCode error correction', () => {
 
 			it('should accept errorCorrectionLevel value: ' + ecValues[l].name[i].toUpperCase(), () => {
 				const qr = QRCode.create('ABCDEFG', {
-					errorCorrectionLevel: ecValues[l].name[i].toUpperCase(),
+					errorCorrectionLevel: ecValues[l].name[
+						i
+					].toUpperCase() as ECLevel.QRCodeErrorCorrectionLevel,
 				});
 				expect(qr.errorCorrectionLevel).toBe(ecValues[l].level);
 			});
@@ -99,11 +108,11 @@ describe('QRCode error correction', () => {
 
 describe('QRCode version', () => {
 	it('should create qrcode with correct version', () => {
-		const qr = QRCode.create('data', { version: 9, errorCorrectionLevel: ECLevel.M });
+		const qr = QRCode.create('data', { version: 9, errorCorrectionLevel: 'M' });
 		expect(qr.version).toBe(9);
 	});
 	it('should set correct EC level', () => {
-		const qr = QRCode.create('data', { version: 9, errorCorrectionLevel: ECLevel.M });
+		const qr = QRCode.create('data', { version: 9, errorCorrectionLevel: 'M' });
 		expect(qr.errorCorrectionLevel).toBe(ECLevel.M);
 	});
 
@@ -111,7 +120,7 @@ describe('QRCode version', () => {
 		expect(() => {
 			QRCode.create(new Array(Version.getCapacity(2, ECLevel.H)).join('a'), {
 				version: 1,
-				errorCorrectionLevel: ECLevel.H,
+				errorCorrectionLevel: 'H',
 			});
 		}).toThrow();
 	});
@@ -120,7 +129,7 @@ describe('QRCode version', () => {
 		expect(() => {
 			QRCode.create(new Array(Version.getCapacity(40, ECLevel.H) + 2).join('a'), {
 				version: 40,
-				errorCorrectionLevel: ECLevel.H,
+				errorCorrectionLevel: 'H',
 			});
 		}).toThrow();
 	});

@@ -22,36 +22,12 @@ describe('Error level from input value', () => {
 	});
 
 	it('should return passed level if value is valid', () => {
-		expect(ECLevel.from(ECLevel.L)).toBe(ECLevel.L);
+		expect(ECLevel.from('L')).toBe(ECLevel.L);
 	});
 	it('should return default level if value is undefined', () => {
-		expect(ECLevel.from(undefined, ECLevel.M)).toBe(ECLevel.M);
+		expect(ECLevel.from(undefined, 'M')).toBe(ECLevel.M);
 	});
 	it('should return default level if value is invalid', () => {
-		expect(ECLevel.from('', ECLevel.Q)).toBe(ECLevel.Q);
-	});
-});
-
-describe('Error level validity', () => {
-	it('should return true if error level is valid', () => {
-		for (let l = 0; l < EC_LEVELS.length; l++) {
-			expect(ECLevel.isValid(EC_LEVELS[l])).toBe(true);
-		}
-	});
-
-	it('should return false if error level is undefined', () => {
-		expect(ECLevel.isValid(undefined)).toBe(false);
-	});
-
-	it('should return false if bit property is undefined', () => {
-		expect(ECLevel.isValid({})).toBe(false);
-	});
-
-	it('should return false if bit property value is < 0', () => {
-		expect(ECLevel.isValid({ bit: -1 })).toBe(false);
-	});
-
-	it('should return false if bit property value is > 3', () => {
-		expect(ECLevel.isValid({ bit: 4 })).toBe(false);
+		expect(ECLevel.from('', 'Q')).toBe(ECLevel.Q);
 	});
 });
