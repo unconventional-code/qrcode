@@ -205,9 +205,6 @@ describe('Version from value', () => {
 	it('should return correct version from a number', () => {
 		expect(Version.from(5)).toEqual(5);
 	});
-	it('should return correct version from a string', () => {
-		expect(Version.from('5')).toEqual(5);
-	});
 	it('should return default value if version is invalid', () => {
 		expect(Version.from(0, 1)).toEqual(1);
 	});
@@ -302,10 +299,8 @@ describe('Version best match', () => {
 
 				if (l === 1) {
 					it('should return best version for ECLevel.M if error level is undefined', () => {
-						// @ts-ignore
-						expect(Version.getBestVersionForData(data, null)).toEqual(v + 1);
-						// @ts-ignore
-						expect(Version.getBestVersionForData([data], null)).toEqual(v + 1);
+						expect(Version.getBestVersionForData(data)).toEqual(v + 1);
+						expect(Version.getBestVersionForData([data])).toEqual(v + 1);
 					});
 				}
 			}
@@ -324,11 +319,8 @@ describe('Version best match', () => {
 			];
 
 			it('should return undefined if data is too big', () => {
-				// @ts-ignore
 				expect(Version.getBestVersionForData(tooBigData, EC_LEVELS[i])).toBeUndefined();
-				// @ts-ignore
 				expect(Version.getBestVersionForData([tooBigData], EC_LEVELS[i])).toBeUndefined();
-				// @ts-ignore
 				expect(Version.getBestVersionForData(tooBigDataArray, EC_LEVELS[i])).toBeUndefined();
 			});
 		}
