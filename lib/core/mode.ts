@@ -92,14 +92,19 @@ export const STRUCTURED_APPEND: Mode = {
  * @return {Number}         Number of bits
  */
 export function getCharCountIndicator(mode: Mode, qrCodeVersion: number) {
-	if (!mode.ccBits) throw new Error('Invalid mode: ' + mode);
+	if (!mode.ccBits) {
+		throw new Error('Invalid mode: ' + mode);
+	}
 
 	if (!VersionCheck.isValid(qrCodeVersion)) {
 		throw new Error('Invalid version: ' + qrCodeVersion);
 	}
 
-	if (qrCodeVersion >= 1 && qrCodeVersion < 10) return mode.ccBits[0];
-	else if (qrCodeVersion < 27) return mode.ccBits[1];
+	if (qrCodeVersion >= 1 && qrCodeVersion < 10) {
+		return mode.ccBits[0];
+	} else if (qrCodeVersion < 27) {
+		return mode.ccBits[1];
+	}
 	return mode.ccBits[2];
 }
 
