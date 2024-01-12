@@ -1,15 +1,19 @@
-const Utils = require('./utils');
-const ECCode = require('./error-correction-code');
-const ECLevel = require('./error-correction-level');
-const Mode = require('./mode');
-const VersionCheck = require('./version-check');
+import * as Utils from './utils';
+import * as ECCode from './error-correction-code';
+import * as ECLevel from './error-correction-level';
+import * as Mode from './mode';
+import * as VersionCheck from './version-check';
 
 // Generator polynomial used to encode version information
 const G18 =
 	(1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
 const G18_BCH = Utils.getBCHDigit(G18);
 
-function getBestVersionForDataLength(mode, length, errorCorrectionLevel) {
+function getBestVersionForDataLength(
+	mode: Mode.Mode,
+	length: number,
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel
+) {
 	for (let currentVersion = 1; currentVersion <= 40; currentVersion++) {
 		if (length <= exports.getCapacity(currentVersion, errorCorrectionLevel, mode)) {
 			return currentVersion;
@@ -19,23 +23,23 @@ function getBestVersionForDataLength(mode, length, errorCorrectionLevel) {
 	return undefined;
 }
 
-function getReservedBitsCount(mode, version) {
+function getReservedBitsCount(mode: Mode.Mode, qrCodeVersion: number) {
 	// Character count indicator + mode indicator bits
-	return Mode.getCharCountIndicator(mode, version) + 4;
+	return Mode.getCharCountIndicator(mode, qrCodeVersion) + 4;
 }
 
-function getTotalBitsFromDataArray(segments, version) {
+function getTotalBitsFromDataArray(segments, qrCodeVersion: number) {
 	let totalBits = 0;
 
 	segments.forEach(function (data) {
-		const reservedBits = getReservedBitsCount(data.mode, version);
+		const reservedBits = getReservedBitsCount(data.mode, qrCodeVersion);
 		totalBits += reservedBits + data.getBitsLength();
 	});
 
 	return totalBits;
 }
 
-function getBestVersionForMixedData(segments, errorCorrectionLevel) {
+function getBestVersionForMixedData(segments, errorCorrectionLevel: ECLevel.ErrorCorrectionLevel) {
 	for (let currentVersion = 1; currentVersion <= 40; currentVersion++) {
 		const length = getTotalBitsFromDataArray(segments, currentVersion);
 		if (length <= exports.getCapacity(currentVersion, errorCorrectionLevel, Mode.MIXED)) {
@@ -50,17 +54,17 @@ function getBestVersionForMixedData(segments, errorCorrectionLevel) {
  * Returns version number from a value.
  * If value is not a valid version, returns defaultValue
  *
- * @param  {Number|String} value        QR Code version
+ * @param  {Number|String} qrCodeVersion        QR Code version
  * @param  {Number}        defaultValue Fallback value
  * @return {Number}                     QR Code version number
  */
-exports.from = function from(value, defaultValue = null) {
-	if (VersionCheck.isValid(value)) {
-		return parseInt(value, 10);
+export function from(qrCodeVersion: number, defaultValue = null) {
+	if (VersionCheck.isValid(qrCodeVersion)) {
+		return parseInt(qrCodeVersion, 10);
 	}
 
 	return defaultValue;
-};
+}
 
 /**
  * Returns how much data can be stored with the specified QR code version
@@ -71,8 +75,12 @@ exports.from = function from(value, defaultValue = null) {
  * @param  {Mode}   mode                 Data mode
  * @return {Number}                      Quantity of storable data
  */
-exports.getCapacity = function getCapacity(version, errorCorrectionLevel, mode) {
-	if (!VersionCheck.isValid(version)) {
+export function getCapacity(
+	qrCodeVersion: number,
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
+	mode: Mode.Mode
+) {
+	if (!VersionCheck.isValid(qrCodeVersion)) {
 		throw new Error('Invalid QR Code version');
 	}
 
@@ -80,17 +88,17 @@ exports.getCapacity = function getCapacity(version, errorCorrectionLevel, mode) 
 	if (typeof mode === 'undefined') mode = Mode.BYTE;
 
 	// Total codewords for this QR code version (Data + Error correction)
-	const totalCodewords = Utils.getSymbolTotalCodewords(version);
+	const totalCodewords = Utils.getSymbolTotalCodewords(qrCodeVersion);
 
 	// Total number of error correction codewords
-	const ecTotalCodewords = ECCode.getTotalCodewordsCount(version, errorCorrectionLevel);
+	const ecTotalCodewords = ECCode.getTotalCodewordsCount(qrCodeVersion, errorCorrectionLevel);
 
 	// Total number of data codewords
 	const dataTotalCodewordsBits = (totalCodewords - ecTotalCodewords) * 8;
 
 	if (mode === Mode.MIXED) return dataTotalCodewordsBits;
 
-	const usableBits = dataTotalCodewordsBits - getReservedBitsCount(mode, version);
+	const usableBits = dataTotalCodewordsBits - getReservedBitsCount(mode, qrCodeVersion);
 
 	// Return max number of storable codewords
 	switch (mode) {
@@ -107,7 +115,7 @@ exports.getCapacity = function getCapacity(version, errorCorrectionLevel, mode) 
 		default:
 			return Math.floor(usableBits / 8);
 	}
-};
+}
 
 /**
  * Returns the minimum version needed to contain the amount of data
@@ -117,7 +125,7 @@ exports.getCapacity = function getCapacity(version, errorCorrectionLevel, mode) 
  * @param  {Mode} mode                       Data mode
  * @return {Number}                          QR Code version
  */
-exports.getBestVersionForData = function getBestVersionForData(data, errorCorrectionLevel) {
+export function getBestVersionForData(data, errorCorrectionLevel: ECLevel.ErrorCorrectionLevel) {
 	let seg;
 
 	const ecl = ECLevel.from(errorCorrectionLevel, ECLevel.M);
@@ -137,7 +145,7 @@ exports.getBestVersionForData = function getBestVersionForData(data, errorCorrec
 	}
 
 	return getBestVersionForDataLength(seg.mode, seg.getLength(), ecl);
-};
+}
 
 /**
  * Returns version information with relative error correction bits
@@ -146,19 +154,19 @@ exports.getBestVersionForData = function getBestVersionForData(data, errorCorrec
  * It consists of an 18-bit sequence containing 6 data bits,
  * with 12 error correction bits calculated using the (18, 6) Golay code.
  *
- * @param  {Number} version QR Code version
+ * @param  {Number} qrCodeVersion QR Code version
  * @return {Number}         Encoded version info bits
  */
-exports.getEncodedBits = function getEncodedBits(version) {
-	if (!VersionCheck.isValid(version) || version < 7) {
+export function getEncodedBits(qrCodeVersion: number) {
+	if (!VersionCheck.isValid(qrCodeVersion) || qrCodeVersion < 7) {
 		throw new Error('Invalid QR Code version');
 	}
 
-	let d = version << 12;
+	let d = qrCodeVersion << 12;
 
 	while (Utils.getBCHDigit(d) - G18_BCH >= 0) {
 		d ^= G18 << (Utils.getBCHDigit(d) - G18_BCH);
 	}
 
-	return (version << 12) | d;
-};
+	return (qrCodeVersion << 12) | d;
+}
