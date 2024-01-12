@@ -393,7 +393,7 @@ function createSymbol(
 	version: number | undefined,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
 	_maskPattern?: MaskPattern.QRCodeMaskPattern
-) {
+): QRCode {
 	let segments: Segments.SegmentData[];
 
 	if (Array.isArray(data)) {
@@ -508,6 +508,29 @@ export interface QRCodeOptions {
 	 * Provide this function if you need support for Kanji mode.
 	 */
 	toSJISFunc?: QRCodeToSJISFunc | undefined;
+}
+
+export interface QRCode {
+	/**
+	 * BitMatrix class with modules data
+	 */
+	modules: BitMatrix;
+	/**
+	 * Calculated QR Code version
+	 */
+	version: number;
+	/**
+	 * Error Correction Level
+	 */
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel;
+	/**
+	 * Calculated Mask pattern
+	 */
+	maskPattern: MaskPattern.QRCodeMaskPattern | undefined;
+	/**
+	 * Generated segments
+	 */
+	segments: Segments.SegmentData[];
 }
 
 /**
