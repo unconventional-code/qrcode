@@ -302,11 +302,7 @@ function buildSingleSegment(data: string, modesHint?: Mode.Mode | string): Segme
 
 		case Mode.STRUCTURED_APPEND:
 			// TODO: Add better support for structured append data
-			return new StructuredAppendData({
-				position: 0,
-				total: 0,
-				parity: 0,
-			});
+			return new StructuredAppendData(data as unknown as StructuredAppendData['data']);
 
 		default:
 			throw new Error('Invalid mode: ' + mode);
