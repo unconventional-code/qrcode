@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Utils from './utils';
 import * as ECLevel from './error-correction-level';
 import BitBuffer from './bit-buffer';
@@ -391,7 +390,7 @@ function createCodewords(
  */
 function createSymbol(
 	data: string | Segments.QRCodeSegment[],
-	version: number,
+	version: number | undefined,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
 	_maskPattern?: MaskPattern.QRCodeMaskPattern
 ) {

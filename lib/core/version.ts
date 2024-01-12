@@ -55,11 +55,11 @@ function getBestVersionForMixedData(segments, errorCorrectionLevel: ECLevel.Erro
  * Returns version number from a value.
  * If value is not a valid version, returns defaultValue
  *
- * @param  {Number|String} qrCodeVersion        QR Code version
+ * @param  {Number} qrCodeVersion        QR Code version
  * @param  {Number}        defaultValue Fallback value
  * @return {Number}                     QR Code version number
  */
-export function from(qrCodeVersion: number, defaultValue?: number) {
+export function from(qrCodeVersion: number | undefined, defaultValue?: number) {
 	if (VersionCheck.isValid(qrCodeVersion)) {
 		return parseInt(qrCodeVersion, 10);
 	}
