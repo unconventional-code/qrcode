@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Utils from './utils';
 import * as ECLevel from './error-correction-level';
 import BitBuffer from './bit-buffer';
@@ -234,7 +233,11 @@ function setupData(matrix: BitMatrix, data: Uint8Array) {
  * @param  {ByteData} segments                 Data input
  * @return {Uint8Array}                    Buffer containing encoded codewords
  */
-function createData(version: number, errorCorrectionLevel: ECLevel.ErrorCorrectionLevel, segments) {
+function createData(
+	version: number,
+	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
+	segments: Segments.SegmentData[]
+) {
 	// Prepare data buffer
 	const buffer = new BitBuffer();
 
@@ -386,12 +389,12 @@ function createCodewords(
  * @return {Object}                      Object containing symbol data
  */
 function createSymbol(
-	data: string,
+	data: string | Segments.QRCodeSegment[],
 	version: number,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
 	_maskPattern?: MaskPattern.QRCodeMaskPattern
 ) {
-	let segments;
+	let segments: Segments.SegmentData[];
 
 	if (Array.isArray(data)) {
 		segments = Segments.fromArray(data);

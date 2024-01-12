@@ -13,7 +13,12 @@ export interface DataSegment {
 	getBitsLength(): number;
 }
 
-type SegmentData = ByteData | NumericData | AlphanumericData | KanjiData | StructuredAppendData;
+export type SegmentData =
+	| ByteData
+	| NumericData
+	| AlphanumericData
+	| KanjiData
+	| StructuredAppendData;
 
 export type QRCodeSegmentMode = 'alphanumeric' | 'numeric' | 'byte' | 'kanji' | 'structuredappend';
 
