@@ -41,17 +41,6 @@ export function isValid(maskPattern: number) {
 }
 
 /**
- * Returns mask pattern from a value.
- * If value is not valid, returns undefined
- *
- * @param  {Number|String} value        Mask pattern value
- * @return {Number}                     Valid mask pattern or undefined
- */
-export function from(value: number | string) {
-	return isValid(value as number) ? parseInt(value as string, 10) : undefined;
-}
-
-/**
  * Find adjacent modules in row/column with the same color
  * and assign a penalty value.
  *
@@ -235,7 +224,7 @@ export function applyMask(maskPattern: number, bitMatrix: BitMatrix) {
 export function getBestMask(
 	bitMatrix: BitMatrix,
 	setupFormatFunc: (maskPattern: number) => void
-): number {
+): QRCodeMaskPattern {
 	const numPatterns = Object.keys(Patterns).length;
 	let bestPattern = 0;
 	let lowerPenalty = Infinity;
@@ -260,5 +249,5 @@ export function getBestMask(
 		}
 	}
 
-	return bestPattern;
+	return bestPattern as QRCodeMaskPattern;
 }

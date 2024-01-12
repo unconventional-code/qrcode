@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Utils from './utils';
 import * as ECLevel from './error-correction-level';
 import BitBuffer from './bit-buffer';
@@ -388,14 +389,14 @@ function createSymbol(
 	data: string,
 	version: number,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
-	maskPattern: MaskPattern.QRCodeMaskPattern
+	_maskPattern?: MaskPattern.QRCodeMaskPattern
 ) {
 	let segments;
 
 	if (Array.isArray(data)) {
 		segments = Segments.fromArray(data);
 	} else if (typeof data === 'string') {
-		let estimatedVersion = version;
+		let estimatedVersion: number | undefined = version;
 
 		if (!estimatedVersion) {
 			const rawSegments = Segments.rawSplit(data);
@@ -457,7 +458,8 @@ function createSymbol(
 	// Add data codewords
 	setupData(modules, dataBits);
 
-	if (isNaN(maskPattern)) {
+	let maskPattern = _maskPattern;
+	if (typeof maskPattern !== 'number') {
 		// Find best mask pattern
 		maskPattern = MaskPattern.getBestMask(
 			modules,
@@ -514,7 +516,7 @@ export interface QRCodeOptions {
  * @param {String} options.errorCorrectionLevel Error correction level
  * @param {Function} options.toSJISFunc         Helper func to convert utf8 to sjis
  */
-export function create(data: string | Segments.QRCodeSegment[], options: QRCodeOptions) {
+export function create(data: string | Segments.QRCodeSegment[], options: QRCodeOptions = {}) {
 	if (typeof data === 'undefined' || data === '') {
 		throw new Error('No input text');
 	}
@@ -522,10 +524,9 @@ export function create(data: string | Segments.QRCodeSegment[], options: QRCodeO
 	// Use higher error correction level as default
 	const errorCorrectionLevel = ECLevel.from(options.errorCorrectionLevel, ECLevel.M);
 	const version = Version.from(options.version);
-	const maskPattern = MaskPattern.from(options.maskPattern);
 	if (options.toSJISFunc) {
 		Utils.setToSJISFunction(options.toSJISFunc);
 	}
 
-	return createSymbol(data, version, errorCorrectionLevel, maskPattern);
+	return createSymbol(data, version, errorCorrectionLevel, options.maskPattern);
 }

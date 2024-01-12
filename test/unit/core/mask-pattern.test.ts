@@ -96,21 +96,6 @@ describe('MaskPattern validity', () => {
 	});
 });
 
-describe('MaskPattern from value', () => {
-	it('should return correct mask pattern from a number', () => {
-		expect(MaskPattern.from(5)).toEqual(5);
-	});
-	it('should return undefined if value is invalid', () => {
-		expect(MaskPattern.from(-1)).toEqual(undefined);
-	});
-	it('should return undefined if value is null', () => {
-		expect(MaskPattern.from(null)).toEqual(undefined);
-	});
-	it('should return undefined from a string', () => {
-		expect(MaskPattern.from('5')).toEqual(undefined);
-	});
-});
-
 describe('Mask pattern - Apply mask', () => {
 	const patterns = Object.keys(MaskPattern.Patterns).length;
 	const expectedPatterns = [
