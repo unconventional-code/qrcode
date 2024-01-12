@@ -1,7 +1,7 @@
 import * as VersionCheck from './version-check';
 import * as Regex from './regex';
 
-export type ModeId = 'Numeric' | 'Alphanumeric' | 'Byte' | 'Kanji' | 'Structured Append';
+export type ModeId = 'Numeric' | 'Alphanumeric' | 'Byte' | 'Kanji' | 'StructuredAppend';
 export interface Mode<TModeId extends ModeId = ModeId> {
 	id: TModeId;
 	bit: number;
@@ -78,7 +78,7 @@ export const MIXED = {
  * character count indicator is required.
  */
 export const STRUCTURED_APPEND: Mode = {
-	id: 'Structured Append',
+	id: 'StructuredAppend',
 	bit: (1 << 0) | (1 << 1),
 	ccBits: [0, 0, 0],
 };
@@ -190,6 +190,7 @@ export function from(value: Mode | string, defaultValue: Mode = BYTE): Mode {
 		return value as Mode;
 	}
 
+	console.log('fromBad', value);
 	try {
 		return fromString(value as string);
 	} catch (e) {

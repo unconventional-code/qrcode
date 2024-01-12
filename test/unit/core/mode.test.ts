@@ -145,7 +145,7 @@ describe('Mode', () => {
 			expect(Mode.toString(Mode.ALPHANUMERIC)).toEqual('Alphanumeric');
 			expect(Mode.toString(Mode.BYTE)).toEqual('Byte');
 			expect(Mode.toString(Mode.KANJI)).toEqual('Kanji');
-			expect(Mode.toString(Mode.STRUCTURED_APPEND)).toEqual('Structured Append');
+			expect(Mode.toString(Mode.STRUCTURED_APPEND)).toEqual('StructuredAppend');
 		});
 
 		it('should throw if mode is invalid', () => {
