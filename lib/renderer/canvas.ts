@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { QRCode } from '../core/qrcode';
 import * as Utils from './utils';
 
@@ -29,12 +28,17 @@ function getCanvasElement() {
 
 export function render(
 	qrData: QRCode,
-	canvas?: HTMLCanvasElement | Utils.QRCodeOptionsInput,
+	canvasOrOptions?: HTMLCanvasElement | Utils.QRCodeOptionsInput,
 	options?: Utils.QRCodeOptionsInput
 ) {
-	const canvasEl = !!canvas && 'getContext' in canvas ? canvas : getCanvasElement();
+	const canvasEl =
+		!!canvasOrOptions && 'getContext' in canvasOrOptions ? canvasOrOptions : getCanvasElement();
 	const _options =
-		typeof options === 'object' ? options : !!canvas && !('getContext' in canvas) ? canvas : {};
+		typeof options === 'object'
+			? options
+			: !!canvasOrOptions && !('getContext' in canvasOrOptions)
+				? canvasOrOptions
+				: {};
 
 	const opts = Utils.getOptions(_options);
 	const size = Utils.getImageWidth(qrData.modules.size, opts);
@@ -42,6 +46,7 @@ export function render(
 	const ctx = canvasEl.getContext('2d');
 	const image = ctx?.createImageData(size, size);
 	if (image) {
+		// @ts-ignore
 		Utils.qrToImageData(image.data, qrData, opts);
 		clearCanvas(ctx, canvasEl, size);
 		ctx?.putImageData(image, 0, 0);
@@ -52,22 +57,27 @@ export function render(
 
 export function renderToDataURL(
 	qrData: QRCode,
-	canvas?: HTMLCanvasElement | Utils.QRCodeOptionsInput,
+	canvasOrOptions?: HTMLCanvasElement | Utils.QRCodeOptionsInput,
 	options?: Utils.QRCodeOptionsInput
 ) {
-	let opts = options;
+	const canvas =
+		typeof canvasOrOptions === 'object' && 'getContext' in canvasOrOptions
+			? canvasOrOptions
+			: undefined;
 
-	if (typeof opts === 'undefined' && (!canvas || !canvas.getContext)) {
-		opts = canvas;
-		canvas = undefined;
-	}
+	const opts =
+		(typeof options === 'undefined' &&
+		typeof canvasOrOptions === 'object' &&
+		!('getContext' in canvasOrOptions)
+			? canvasOrOptions
+			: options) ?? {};
 
-	if (!opts) opts = {};
-
-	const canvasEl = exports.render(qrData, canvas, opts);
+	const canvasEl = render(qrData, canvas, opts);
 
 	const type = opts.type || 'image/png';
-	const rendererOpts = opts.rendererOpts || {};
+	const rendererOpts = 'rendererOpts' in opts ? opts.rendererOpts ?? {} : {};
 
-	return canvasEl.toDataURL(type, rendererOpts.quality);
+	const quality = 'quality' in rendererOpts ? rendererOpts.quality : undefined;
+
+	return canvasEl.toDataURL(type, quality);
 }
