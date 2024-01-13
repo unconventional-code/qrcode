@@ -1,20 +1,46 @@
-const Utils = require('./utils');
+import { QRCode } from '../core/qrcode';
 
-function getColorAttrib(color, attrib) {
+import * as Utils from './utils';
+
+function getColorAttrib(color: ReturnType<typeof Utils.hex2rgba>, attrib: 'fill' | 'stroke') {
 	const alpha = color.a / 255;
 	const str = attrib + '="' + color.hex + '"';
 
 	return alpha < 1 ? str + ' ' + attrib + '-opacity="' + alpha.toFixed(2).slice(1) + '"' : str;
 }
 
-function svgCmd(cmd, x, y) {
+type SvgDCommands =
+	| 'M'
+	| 'm'
+	| 'L'
+	| 'l'
+	| 'H'
+	| 'h'
+	| 'V'
+	| 'v'
+	| 'C'
+	| 'c'
+	| 'S'
+	| 's'
+	| 'Q'
+	| 'q'
+	| 'T'
+	| 't'
+	| 'A'
+	| 'a'
+	| 'Z'
+	| 'z';
+
+function svgCmd(cmd: SvgDCommands, x: number, y?: number) {
 	let str = cmd + x;
-	if (typeof y !== 'undefined') str += ' ' + y;
+	if (typeof y !== 'undefined') {
+		str += ' ' + y;
+	}
 
 	return str;
 }
 
-function qrToPath(data, size, margin) {
+function qrToPath(data: Uint8Array, size: number, margin: number) {
 	let path = '';
 	let moveBy = 0;
 	let newRow = false;
@@ -48,7 +74,11 @@ function qrToPath(data, size, margin) {
 	return path;
 }
 
-exports.render = function render(qrData, options, cb) {
+export function render(
+	qrData: QRCode,
+	options: Utils.QRCodeOptionsInput,
+	cb?: (error: Error | null | undefined, string: string) => void
+) {
 	const opts = Utils.getOptions(options);
 	const size = qrData.modules.size;
 	const data = qrData.modules.data;
@@ -92,4 +122,4 @@ exports.render = function render(qrData, options, cb) {
 	}
 
 	return svgTag;
-};
+}

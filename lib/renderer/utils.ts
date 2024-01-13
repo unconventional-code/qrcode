@@ -156,7 +156,7 @@ export interface QRCodeToBufferOptions extends QRCodeRenderersOptions {
 		| undefined;
 }
 
-function hex2rgba(hex: string) {
+export function hex2rgba(hex: string) {
 	if (typeof hex !== 'string') {
 		throw new Error('Color should be defined as hex string');
 	}
