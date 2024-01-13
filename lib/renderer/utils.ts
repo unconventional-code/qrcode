@@ -69,6 +69,12 @@ export interface QRCodeToStringOptionsTerminal extends QRCodeRenderersOptions {
 	 * @default 'utf8'
 	 */
 	type: 'terminal';
+
+	/**
+	 * Inverse the color of the terminal.
+	 */
+	inverse?: boolean;
+
 	/**
 	 * Outputs smaller QR code.
 	 * @default false

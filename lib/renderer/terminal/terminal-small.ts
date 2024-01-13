@@ -1,3 +1,6 @@
+import { QRCode } from '../../core/qrcode';
+import { QRCodeToStringOptionsTerminal } from '../utils';
+
 const backgroundWhite = '\x1b[47m';
 const backgroundBlack = '\x1b[40m';
 const foregroundWhite = '\x1b[37m';
@@ -6,7 +9,13 @@ const reset = '\x1b[0m';
 const lineSetupNormal = backgroundWhite + foregroundBlack; // setup colors
 const lineSetupInverse = backgroundBlack + foregroundWhite; // setup colors
 
-const createPalette = function (lineSetup, foregroundWhite, foregroundBlack) {
+type PaletteKey = '00' | '01' | '02' | '10' | '11' | '12' | '20' | '21' | '22';
+
+const createPalette = function (
+	lineSetup: string,
+	foregroundWhite: string,
+	foregroundBlack: string
+): Record<PaletteKey, string> {
 	return {
 		// 1 ... white, 2 ... black, 0 ... transparent (default)
 
@@ -30,13 +39,13 @@ const createPalette = function (lineSetup, foregroundWhite, foregroundBlack) {
  * @param {number} y
  * @return {'0' | '1' | '2'}
  */
-const mkCodePixel = function (modules, size, x, y) {
+function mkCodePixel(modules: Uint8Array, size: number, x: number, y: number) {
 	const sizePlus = size + 1;
 	if (x >= sizePlus || y >= sizePlus || y < -1 || x < -1) return '0';
 	if (x >= size || y >= size || y < 0 || x < 0) return '1';
 	const idx = y * size + x;
 	return modules[idx] ? '2' : '1';
-};
+}
 
 /**
  * Returns code for four QR pixels. Suitable as key in palette.
@@ -46,11 +55,15 @@ const mkCodePixel = function (modules, size, x, y) {
  * @param {number} y
  * @return {keyof palette}
  */
-const mkCode = function (modules, size, x, y) {
-	return mkCodePixel(modules, size, x, y) + mkCodePixel(modules, size, x, y + 1);
-};
+function mkCode(modules: Uint8Array, size: number, x: number, y: number) {
+	return `${mkCodePixel(modules, size, x, y)}${mkCodePixel(modules, size, x, y + 1)}` as PaletteKey;
+}
 
-exports.render = function (qrData, options, cb) {
+export function render(
+	qrData: QRCode,
+	options: QRCodeToStringOptionsTerminal,
+	cb?: (error: Error | null | undefined, string: string) => void
+) {
 	const size = qrData.modules.size;
 	const data = qrData.modules.data;
 
@@ -79,4 +92,4 @@ exports.render = function (qrData, options, cb) {
 	}
 
 	return output;
-};
+}
