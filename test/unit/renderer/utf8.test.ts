@@ -1,6 +1,6 @@
 import fs from 'fs';
 import * as QRCode from '../../../lib/core/qrcode';
-import Utf8Renderer from '../../../lib/renderer/utf8';
+import * as Utf8Renderer from '../../../lib/renderer/utf8';
 
 describe('Utf8Renderer interface', () => {
 	it('should have render function', () => {
@@ -10,7 +10,6 @@ describe('Utf8Renderer interface', () => {
 });
 
 describe('Utf8Renderer render', () => {
-	// @ts-ignore
 	const sampleQrData = QRCode.create('sample text', { version: 2 });
 	let str: string | undefined;
 
@@ -35,7 +34,6 @@ describe('Utf8Renderer render', () => {
 });
 
 describe('Utf8 renderToFile', () => {
-	// @ts-ignore
 	const sampleQrData = QRCode.create('sample text', { version: 2 });
 	const fileName = 'qrimage.txt';
 
@@ -47,7 +45,7 @@ describe('Utf8 renderToFile', () => {
 		const fsSpy = jest.spyOn(fs, 'writeFile');
 		fsSpy.mockImplementation((path, data, cb) => {});
 
-		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err: any) {
+		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err) {
 			expect(err).toBeFalsy();
 		});
 	});
@@ -55,7 +53,7 @@ describe('Utf8 renderToFile', () => {
 	it('should save file with correct file name', () => {
 		const fsSpy = jest.spyOn(fs, 'writeFile');
 		fsSpy.mockImplementation((path, data, cb) => {});
-		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err: any) {
+		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err) {
 			expect(fsSpy).toHaveBeenCalledWith(fileName);
 		});
 	});
@@ -70,7 +68,7 @@ describe('Utf8 renderToFile', () => {
 				margin: 10,
 				scale: 1,
 			},
-			function (err: any) {
+			function (err) {
 				expect(err).toBeFalsy();
 			}
 		);
@@ -86,7 +84,7 @@ describe('Utf8 renderToFile', () => {
 				margin: 10,
 				scale: 1,
 			},
-			function (err: any) {
+			function (err) {
 				expect(fsSpy).toHaveBeenCalledWith(fileName);
 			}
 		);
@@ -97,7 +95,7 @@ describe('Utf8 renderToFile', () => {
 		fsSpy.mockImplementation((path, data, cb) => {
 			cb(new Error());
 		});
-		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err: any) {
+		Utf8Renderer.renderToFile(fileName, sampleQrData, function (err) {
 			expect(err).toBeTruthy();
 		});
 	});

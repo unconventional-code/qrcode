@@ -1,4 +1,8 @@
-const Utils = require('./utils');
+// @ts-nocheck
+import fs from 'fs';
+
+import { QRCode } from '../core/qrcode';
+import * as Utils from './utils';
 
 const BLOCK_CHAR = {
 	WW: ' ',
@@ -14,14 +18,28 @@ const INVERTED_BLOCK_CHAR = {
 	WB: '▀',
 };
 
-function getBlockChar(top, bottom, blocks) {
-	if (top && bottom) return blocks.BB;
-	if (top && !bottom) return blocks.BW;
-	if (!top && bottom) return blocks.WB;
+function getBlockChar(
+	top: number,
+	bottom: number,
+	blocks: typeof BLOCK_CHAR | typeof INVERTED_BLOCK_CHAR
+) {
+	if (top && bottom) {
+		return blocks.BB;
+	}
+	if (top && !bottom) {
+		return blocks.BW;
+	}
+	if (!top && bottom) {
+		return blocks.WB;
+	}
 	return blocks.WW;
 }
 
-exports.render = function (qrData, options, cb) {
+export function render(
+	qrData: QRCode,
+	options?: Utils.QRCodeOptionsInput,
+	cb?: (error: Error | null | undefined, string: string) => void
+) {
 	const opts = Utils.getOptions(options);
 	let blocks = BLOCK_CHAR;
 	if (opts.color.dark.hex === '#ffffff' || opts.color.light.hex === '#000000') {
@@ -57,15 +75,19 @@ exports.render = function (qrData, options, cb) {
 	}
 
 	return output;
-};
+}
 
-exports.renderToFile = function renderToFile(path, qrData, options, cb) {
+export function renderToFile(
+	path: string,
+	qrData: QRCode,
+	options?: Utils.QRCodeOptionsInput | ((error: Error) => void),
+	cb?: (error: Error) => void
+) {
 	if (typeof cb === 'undefined') {
 		cb = options;
 		options = undefined;
 	}
 
-	const fs = require('fs');
-	const utf8 = exports.render(qrData, options);
+	const utf8 = render(qrData, options);
 	fs.writeFile(path, utf8, cb);
-};
+}
