@@ -1,6 +1,6 @@
 const { Canvas, createCanvas } = require('canvas');
 import * as QRCode from '../../../lib/core/qrcode';
-import CanvasRenderer from '../../../lib/renderer/canvas';
+import * as CanvasRenderer from '../../../lib/renderer/canvas';
 
 describe('CanvasRenderer interface', () => {
 	it('should have render function', () => {
