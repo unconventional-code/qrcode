@@ -1,10 +1,16 @@
 import BitBuffer from './bit-buffer';
 import * as Mode from './mode';
 
+export type StructuredAppendDataPayload = {
+	position: number;
+	total: number;
+	parity: number;
+};
+
 export default class StructuredAppendData {
 	mode: Mode.Mode;
-	data: { position: number; total: number; parity: number };
-	constructor(data: { position: number; total: number; parity: number }) {
+	data: StructuredAppendDataPayload;
+	constructor(data: StructuredAppendDataPayload) {
 		this.mode = Mode.STRUCTURED_APPEND;
 		this.data = data;
 	}

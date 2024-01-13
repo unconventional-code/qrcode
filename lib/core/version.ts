@@ -82,15 +82,11 @@ export function from(qrCodeVersion: number | undefined, defaultValue?: number) {
 export function getCapacity(
 	qrCodeVersion: number,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
-	mode: Mode.Mode
+	// Use Byte mode as default
+	mode: Mode.Mode = Mode.BYTE
 ) {
 	if (!VersionCheck.isValid(qrCodeVersion)) {
 		throw new Error('Invalid QR Code version');
-	}
-
-	// Use Byte mode as default
-	if (typeof mode === 'undefined') {
-		mode = Mode.BYTE;
 	}
 
 	// Total codewords for this QR code version (Data + Error correction)

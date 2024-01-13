@@ -99,43 +99,29 @@ describe('Mode', () => {
 			});
 		});
 	});
-	describe('isValid', () => {
-		it('determines if the mode is valid', () => {
-			expect(Mode.isValid(Mode.NUMERIC)).toBe(true);
-			expect(Mode.isValid(Mode.ALPHANUMERIC)).toBe(true);
-			expect(Mode.isValid(Mode.BYTE)).toBe(true);
-			expect(Mode.isValid(Mode.KANJI)).toBe(true);
-			expect(Mode.isValid(Mode.STRUCTURED_APPEND)).toBe(true);
-
-			expect(Mode.isValid(undefined as unknown as Mode.Mode)).toBe(false);
-			expect(Mode.isValid({ bit: 1 } as unknown as Mode.Mode)).toBe(false);
-			expect(Mode.isValid({ ccBits: [] } as unknown as Mode.Mode)).toBe(false);
-		});
-	});
 
 	describe('From value', () => {
-		const modes = [
-			{ name: 'numeric', mode: Mode.NUMERIC },
-			{ name: 'alphanumeric', mode: Mode.ALPHANUMERIC },
-			{ name: 'kanji', mode: Mode.KANJI },
-			{ name: 'byte', mode: Mode.BYTE },
-			{ name: 'structuredappend', mode: Mode.STRUCTURED_APPEND },
+		const modes: { name: Mode.ModeId; mode: Mode.Mode }[] = [
+			{ name: 'Numeric', mode: Mode.NUMERIC },
+			{ name: 'Alphanumeric', mode: Mode.ALPHANUMERIC },
+			{ name: 'Kanji', mode: Mode.KANJI },
+			{ name: 'Byte', mode: Mode.BYTE },
+			{ name: 'StructuredAppend', mode: Mode.STRUCTURED_APPEND },
 		];
 
 		it('should return mode from value', () => {
 			for (let m = 0; m < modes.length; m++) {
 				expect(Mode.from(modes[m].name)).toEqual(modes[m].mode);
-				expect(Mode.from(modes[m].name.toUpperCase())).toEqual(modes[m].mode);
-				expect(Mode.from(modes[m].mode)).toEqual(modes[m].mode);
+				expect(Mode.from(modes[m].name.toUpperCase() as Mode.ModeId)).toEqual(modes[m].mode);
 			}
 		});
 
 		it('should return default value if mode is invalid', () => {
-			expect(Mode.from('', Mode.NUMERIC)).toEqual(Mode.NUMERIC);
+			expect(Mode.from('' as Mode.ModeId, 'Numeric')).toEqual(Mode.NUMERIC);
 		});
 
 		it('should return default value if mode is undefined', () => {
-			expect(Mode.from(null as unknown as Mode.Mode, Mode.NUMERIC)).toEqual(Mode.NUMERIC);
+			expect(Mode.from(null as unknown as Mode.ModeId, 'Numeric')).toEqual(Mode.NUMERIC);
 		});
 	});
 

@@ -1,5 +1,6 @@
 import * as VersionCheck from './version-check';
 import * as Regex from './regex';
+import { StructuredAppendDataPayload } from './structured-append-data';
 
 export type ModeId = 'Numeric' | 'Alphanumeric' | 'Byte' | 'Kanji' | 'StructuredAppend';
 export interface Mode<TModeId extends ModeId = ModeId> {
@@ -114,15 +115,20 @@ export function getCharCountIndicator(mode: Mode, qrCodeVersion: number) {
  * @param  {String} dataStr Input data string
  * @return {Mode}           Best mode
  */
-export function getBestModeForData(dataStr: string) {
-	if (Regex.testNumeric(dataStr)) {
-		return NUMERIC;
-	} else if (Regex.testAlphanumeric(dataStr)) {
-		return ALPHANUMERIC;
-	} else if (Regex.testKanji(dataStr)) {
-		return KANJI;
+export function getBestModeForData(dataStr: string | StructuredAppendDataPayload) {
+	if (typeof dataStr === 'string') {
+		if (Regex.testNumeric(dataStr)) {
+			return NUMERIC;
+		} else if (Regex.testAlphanumeric(dataStr)) {
+			return ALPHANUMERIC;
+		} else if (Regex.testKanji(dataStr)) {
+			return KANJI;
+		}
+		return BYTE;
+	} else if (typeof dataStr === 'object') {
+		return STRUCTURED_APPEND;
 	}
-	return BYTE;
+	throw new Error('Invalid data');
 }
 
 /**
@@ -136,16 +142,6 @@ export function toString(mode: Mode) {
 		return mode.id;
 	}
 	throw new Error('Invalid mode');
-}
-
-/**
- * Check if input param is a valid mode object
- *
- * @param   {Mode}    mode Mode object
- * @returns {Boolean} True if valid mode, false otherwise
- */
-export function isValid(mode: Mode) {
-	return !!mode && !!mode.bit && !!mode.ccBits;
 }
 
 /**
@@ -185,15 +181,10 @@ function fromString(str: string) {
  * @param  {Mode}        defaultValue Fallback value
  * @return {Mode}                     Encoding mode
  */
-export function from(value: Mode | string, defaultValue: Mode = BYTE): Mode {
-	if (isValid(value as Mode)) {
-		return value as Mode;
-	}
-
-	console.log('fromBad', value);
+export function from(value: ModeId, defaultValue: ModeId = 'Byte'): Mode {
 	try {
-		return fromString(value as string);
+		return fromString(value);
 	} catch (e) {
-		return defaultValue;
+		return fromString(defaultValue);
 	}
 }

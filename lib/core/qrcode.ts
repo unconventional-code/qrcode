@@ -389,7 +389,7 @@ function createCodewords(
  * @return {Object}                      Object containing symbol data
  */
 function createSymbol(
-	data: string | Segments.QRCodeSegment[],
+	data: string | Segments.QRCodeSegmentInput[],
 	version: number | undefined,
 	errorCorrectionLevel: ECLevel.ErrorCorrectionLevel,
 	_maskPattern?: MaskPattern.QRCodeMaskPattern
@@ -397,7 +397,11 @@ function createSymbol(
 	let segments: Segments.SegmentData[];
 
 	if (Array.isArray(data)) {
-		segments = Segments.fromArray(data);
+		console.log({ segment: data[0] });
+
+		segments = Segments.fromArray(
+			data.map((segment) => ({ ...segment, mode: Mode.from(segment.mode) }))
+		);
 	} else if (typeof data === 'string') {
 		let estimatedVersion: number | undefined = version;
 
@@ -542,7 +546,7 @@ export interface QRCode {
  * @param {String} options.errorCorrectionLevel Error correction level
  * @param {Function} options.toSJISFunc         Helper func to convert utf8 to sjis
  */
-export function create(data: string | Segments.QRCodeSegment[], options: QRCodeOptions = {}) {
+export function create(data: string | Segments.QRCodeSegmentInput[], options: QRCodeOptions = {}) {
 	if (typeof data === 'undefined' || data === '') {
 		throw new Error('No input text');
 	}

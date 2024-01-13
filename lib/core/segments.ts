@@ -3,7 +3,7 @@ import NumericData from './numeric-data';
 import AlphanumericData from './alphanumeric-data';
 import ByteData from './byte-data';
 import KanjiData from './kanji-data';
-import StructuredAppendData from './structured-append-data';
+import StructuredAppendData, { StructuredAppendDataPayload } from './structured-append-data';
 import * as Regex from './regex';
 import * as Utils from './utils';
 import dijkstra from 'dijkstrajs';
@@ -21,6 +21,13 @@ export type SegmentData =
 	| StructuredAppendData;
 
 export type QRCodeSegmentMode = 'alphanumeric' | 'numeric' | 'byte' | 'kanji' | 'structuredappend';
+
+export type QRCodeSegmentInput = {
+	mode: Mode.ModeId;
+	data: string;
+	index: number;
+	length: number;
+};
 
 export type QRCodeSegment = {
 	mode: Mode.Mode;
@@ -63,6 +70,12 @@ function getSegments(regex: RegExp, mode: Mode.Mode, str: string): QRCodeSegment
 	return segments;
 }
 
+type GetSegmentsFromStringResult = {
+	data: string;
+	mode: Mode.Mode;
+	length: number;
+};
+
 /**
  * Extracts a series of segments with the appropriate
  * modes from a string
@@ -70,7 +83,7 @@ function getSegments(regex: RegExp, mode: Mode.Mode, str: string): QRCodeSegment
  * @param  {String} dataStr Input string
  * @return {Array}          Array of object with segments data
  */
-function getSegmentsFromString(dataStr: string) {
+function getSegmentsFromString(dataStr: string): GetSegmentsFromStringResult[] {
 	const numSegs = getSegments(Regex.NUMERIC, Mode.NUMERIC, dataStr);
 	const alphaNumSegs = getSegments(Regex.ALPHANUMERIC, Mode.ALPHANUMERIC, dataStr);
 	let byteSegs: QRCodeSegment[];
@@ -86,16 +99,17 @@ function getSegmentsFromString(dataStr: string) {
 
 	const segs = numSegs.concat(alphaNumSegs, byteSegs, kanjiSegs);
 
-	return segs.sort(function (s1, s2) {
-		return s1.index - s2.index;
-	});
-	// .map(function (obj) {
-	// 	return {
-	// 		data: obj.data,
-	// 		mode: obj.mode,
-	// 		length: obj.length,
-	// 	};
-	// });
+	return segs
+		.sort(function (s1, s2) {
+			return s1.index - s2.index;
+		})
+		.map(function (obj) {
+			return {
+				data: obj.data,
+				mode: obj.mode,
+				length: obj.length,
+			};
+		});
 }
 
 /**
@@ -158,7 +172,7 @@ function mergeSegments(segs: GraphSegment[]) {
  * @param  {Array} segs Array of object with segments data
  * @return {Array}      Array of object with segments data
  */
-function buildNodes(segs: QRCodeSegment[]) {
+function buildNodes(segs: GetSegmentsFromStringResult[]) {
 	const nodes = [];
 	for (let i = 0; i < segs.length; i++) {
 		const seg = segs[i];
@@ -269,10 +283,13 @@ function buildGraph(nodes: GraphSegment[][], qrCodeVersion: number) {
  * @param  {Mode | String} modesHint Data mode
  * @return {Segment}                 Segment
  */
-function buildSingleSegment(data: string, modesHint?: Mode.Mode | string): SegmentData {
+function buildSingleSegment(
+	data: string | StructuredAppendDataPayload,
+	modesHint?: Mode.Mode
+): SegmentData {
 	const bestMode = Mode.getBestModeForData(data);
 
-	let mode = modesHint ? Mode.from(modesHint, bestMode) : bestMode;
+	let mode = modesHint ?? bestMode;
 
 	// Make sure data can be encoded
 	if (mode !== Mode.BYTE && mode !== Mode.STRUCTURED_APPEND && mode.bit < bestMode.bit) {
@@ -294,25 +311,41 @@ function buildSingleSegment(data: string, modesHint?: Mode.Mode | string): Segme
 
 	switch (mode) {
 		case Mode.NUMERIC:
+			if (typeof data !== 'string') {
+				throw new Error('Invalid mode: ' + mode);
+			}
 			return new NumericData(data);
 
 		case Mode.ALPHANUMERIC:
+			if (typeof data !== 'string') {
+				throw new Error('Invalid mode: ' + mode);
+			}
 			return new AlphanumericData(data);
 
 		case Mode.KANJI:
+			if (typeof data !== 'string') {
+				throw new Error('Invalid mode: ' + mode);
+			}
 			return new KanjiData(data);
 
 		case Mode.BYTE:
-			return new ByteData(data);
+			return new ByteData(data as string | Uint8Array | Uint8ClampedArray | number[]);
 
 		case Mode.STRUCTURED_APPEND:
-			// TODO: Add better support for structured append data
+			if (typeof data !== 'object') {
+				throw new Error('Invalid mode: ' + mode);
+			}
 			return new StructuredAppendData(data as unknown as StructuredAppendData['data']);
 
 		default:
 			throw new Error('Invalid mode: ' + mode);
 	}
 }
+
+export type FromArraySegment = {
+	data: string | StructuredAppendDataPayload;
+	mode?: Mode.Mode;
+};
 
 /**
  * Builds a list of segments from an array.
@@ -329,7 +362,7 @@ function buildSingleSegment(data: string, modesHint?: Mode.Mode | string): Segme
  * @param  {Array} array Array of objects with segments data
  * @return {Array}       Array of Segments
  */
-export function fromArray(array: (GraphSegment | string)[]): SegmentData[] {
+export function fromArray(array: (FromArraySegment | string)[]): SegmentData[] {
 	return array.reduce(function (acc: SegmentData[], seg) {
 		if (typeof seg === 'string') {
 			acc.push(buildSingleSegment(seg));

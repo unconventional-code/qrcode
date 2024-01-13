@@ -2,6 +2,7 @@
 import * as ECLevel from '../../../lib/core/error-correction-level';
 import * as Version from '../../../lib/core/version';
 import * as QRCode from '../../../lib/core/qrcode';
+import * as Mode from '../../../lib/core/mode';
 import toSJIS from '../../../helper/to-sjis';
 
 describe('QRCode interface', () => {
@@ -153,12 +154,12 @@ describe('QRCode capacity', () => {
 	});
 
 	it('should contain 10 alphanumeric characters', () => {
-		const qr = QRCode.create([{ data: 'ABCDEFGHIL', mode: 'alphanumeric' }]);
+		const qr = QRCode.create([{ data: 'ABCDEFGHIL', mode: Mode.ALPHANUMERIC }]);
 		expect(qr.version).toBe(1);
 	});
 
 	it('should contain 4 kanji characters', () => {
-		const qr = QRCode.create([{ data: 'ＡＩぐサ', mode: 'kanji' }], { toSJISFunc: toSJIS });
+		const qr = QRCode.create([{ data: 'ＡＩぐサ', mode: Mode.KANJI }], { toSJISFunc: toSJIS });
 		expect(qr.version).toBe(1);
 	});
 });

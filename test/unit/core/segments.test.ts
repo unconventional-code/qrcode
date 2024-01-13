@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Mode from '../../../lib/core/mode';
 import * as Segments from '../../../lib/core/segments';
 import NumericData from '../../../lib/core/numeric-data';
@@ -179,8 +178,8 @@ describe('Segments from array', () => {
 	it('should return correct segment from array of objects if mode is specified as string', () => {
 		expect(
 			Segments.fromArray([
-				{ data: 'abcdef', mode: 'byte' },
-				{ data: '12345', mode: 'numeric' },
+				{ data: 'abcdef', mode: Mode.BYTE },
+				{ data: '12345', mode: Mode.NUMERIC },
 			])
 		).toEqual([new ByteData('abcdef'), new NumericData('12345')]);
 	});
@@ -193,7 +192,7 @@ describe('Segments from array', () => {
 	});
 
 	it('should return an empty array if input payload is empty', () => {
-		expect(Segments.fromArray([{}])).toEqual([]);
+		expect(Segments.fromArray([{} as Segments.FromArraySegment])).toEqual([]);
 	});
 
 	it('should return an empty array if input is empty', () => {
@@ -202,7 +201,7 @@ describe('Segments from array', () => {
 
 	it('should throw if segment cannot be encoded with specified mode', () => {
 		expect(() => {
-			Segments.fromArray([{ data: 'ABCDE', mode: 'numeric' }]);
+			Segments.fromArray([{ data: 'ABCDE', mode: Mode.NUMERIC }]);
 		}).toThrow();
 	});
 
@@ -216,14 +215,14 @@ describe('Segments from array', () => {
 describe('Segments optimization', () => {
 	it('should use Byte mode if Kanji support is disabled', () => {
 		expect(Segments.fromString('乂ЁЖ', 1)).toEqual(
-			Segments.fromArray([{ data: '乂ЁЖ', mode: 'byte' }])
+			Segments.fromArray([{ data: '乂ЁЖ', mode: Mode.BYTE }])
 		);
 	});
 
 	it('should use Structured Append mode', () => {
 		expect(
 			Segments.fromArray([
-				{ data: { position: 0x1, total: 0x3, parity: 0x0a }, mode: 'structuredappend' },
+				{ data: { position: 0x1, total: 0x3, parity: 0x0a }, mode: Mode.STRUCTURED_APPEND },
 			])
 		).toEqual([new StructuredAppendData({ position: 0x1, total: 0x3, parity: 0x0a })]);
 	});
