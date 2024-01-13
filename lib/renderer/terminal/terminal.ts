@@ -1,6 +1,11 @@
-// let Utils = require('./utils')
+import { QRCode } from '../../core/qrcode';
+import { QRCodeToStringOptionsTerminal } from '../utils';
 
-exports.render = function (qrData, options, cb) {
+export function render(
+	qrData: QRCode,
+	options: QRCodeToStringOptionsTerminal,
+	cb?: (error: Error | null | undefined, string: string) => void
+) {
 	const size = qrData.modules.size;
 	const data = qrData.modules.data;
 
@@ -34,16 +39,4 @@ exports.render = function (qrData, options, cb) {
 	}
 
 	return output;
-};
-/*
-exports.renderToFile = function renderToFile (path, qrData, options, cb) {
-  if (typeof cb === 'undefined') {
-    cb = options
-    options = undefined
-  }
-
-  let fs = require('fs')
-  let utf8 = exports.render(qrData, options)
-  fs.writeFile(path, utf8, cb)
 }
-*/
