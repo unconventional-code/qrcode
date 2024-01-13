@@ -168,9 +168,9 @@ function fromString(str: string) {
  * @param  {Mode}        defaultValue Fallback value
  * @return {Mode}                     Encoding mode
  */
-export function from(value: ModeId, defaultValue: ModeId = 'Byte'): Mode {
+export function from(value?: ModeId, defaultValue: ModeId = 'Byte'): Mode {
 	try {
-		return fromString(value);
+		return fromString(value ?? defaultValue);
 	} catch (e) {
 		return fromString(defaultValue);
 	}

@@ -1,9 +1,8 @@
-// @ts-nocheck
 import * as ECLevel from '../../../lib/core/error-correction-level';
 import * as Version from '../../../lib/core/version';
 import * as QRCode from '../../../lib/core/qrcode';
-import * as Mode from '../../../lib/core/mode';
 import toSJIS from '../../../helper/to-sjis';
+import { QRCodeSegmentInput } from '../../../lib/core/segments';
 
 describe('QRCode interface', () => {
 	it('should have create function', () => {
@@ -41,7 +40,7 @@ describe('QRCode interface', () => {
 	});
 
 	it('should throw if invalid data is passed', () => {
-		expect(() => QRCode.create({})).toThrow();
+		expect(() => QRCode.create({} as unknown as QRCodeSegmentInput[])).toThrow();
 	});
 
 	it('should accept data as string', () => {
@@ -52,10 +51,10 @@ describe('QRCode interface', () => {
 		expect(() =>
 			QRCode.create(
 				[
-					{ data: 'ABCDEFG', mode: 'alphanumeric' },
+					{ data: 'ABCDEFG', mode: 'Alphanumeric' },
 					{ data: 'abcdefg' },
-					{ data: '晒三', mode: 'kanji' },
-					{ data: '0123456', mode: 'numeric' },
+					{ data: '晒三', mode: 'Kanji' },
+					{ data: '0123456', mode: 'Numeric' },
 				],
 				{ toSJISFunc: toSJIS }
 			)
@@ -137,29 +136,29 @@ describe('QRCode version', () => {
 
 	it('should use best version if the one provided is invalid', () => {
 		expect(() => {
-			QRCode.create('abcdefg', { version: 'invalid' });
+			QRCode.create('abcdefg', { version: 'invalid' as unknown as number });
 		}).not.toThrow();
 	});
 });
 
 describe('QRCode capacity', () => {
 	it('should contain 7 byte characters', () => {
-		const qr = QRCode.create([{ data: 'abcdefg', mode: 'byte' }]);
+		const qr = QRCode.create([{ data: 'abcdefg', mode: 'Byte' }]);
 		expect(qr.version).toBe(1);
 	});
 
 	it('should contain 17 numeric characters', () => {
-		const qr = QRCode.create([{ data: '12345678901234567', mode: 'numeric' }]);
+		const qr = QRCode.create([{ data: '12345678901234567', mode: 'Numeric' }]);
 		expect(qr.version).toBe(1);
 	});
 
 	it('should contain 10 alphanumeric characters', () => {
-		const qr = QRCode.create([{ data: 'ABCDEFGHIL', mode: Mode.ALPHANUMERIC }]);
+		const qr = QRCode.create([{ data: 'ABCDEFGHIL', mode: 'Alphanumeric' }]);
 		expect(qr.version).toBe(1);
 	});
 
 	it('should contain 4 kanji characters', () => {
-		const qr = QRCode.create([{ data: 'ＡＩぐサ', mode: Mode.KANJI }], { toSJISFunc: toSJIS });
+		const qr = QRCode.create([{ data: 'ＡＩぐサ', mode: 'Kanji' }], { toSJISFunc: toSJIS });
 		expect(qr.version).toBe(1);
 	});
 });

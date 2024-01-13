@@ -23,10 +23,8 @@ export type SegmentData =
 export type QRCodeSegmentMode = 'alphanumeric' | 'numeric' | 'byte' | 'kanji' | 'structuredappend';
 
 export type QRCodeSegmentInput = {
-	mode: Mode.ModeId;
+	mode?: Mode.ModeId;
 	data: string;
-	index: number;
-	length: number;
 };
 
 export type QRCodeSegment = {

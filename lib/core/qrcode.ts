@@ -489,7 +489,7 @@ function createSymbol(
 	};
 }
 
-export type QRCodeToSJISFunc = (codePoint: string) => number;
+export type QRCodeToSJISFunc = (codePoint: string) => number | undefined;
 
 export interface QRCodeOptions {
 	/**
