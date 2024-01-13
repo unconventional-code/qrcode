@@ -3,7 +3,7 @@ import { QRCodeToStringOptionsTerminal } from '../utils';
 
 export function render(
 	qrData: QRCode,
-	options: QRCodeToStringOptionsTerminal,
+	options?: QRCodeToStringOptionsTerminal,
 	cb?: (error: Error | null | undefined, string: string) => void
 ) {
 	const size = qrData.modules.size;

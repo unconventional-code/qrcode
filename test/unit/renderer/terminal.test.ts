@@ -1,5 +1,5 @@
 import * as QRCode from '../../../lib/core/qrcode';
-import TerminalRenderer from '../../../lib/renderer/terminal';
+import * as TerminalRenderer from '../../../lib/renderer/terminal';
 
 describe('TerminalRenderer interface', () => {
 	it('should have render function', () => {
@@ -9,7 +9,6 @@ describe('TerminalRenderer interface', () => {
 });
 
 describe('TerminalRenderer render big', () => {
-	// @ts-ignore
 	const sampleQrData = QRCode.create('sample text', { version: 2 });
 	let str: string | undefined;
 
@@ -22,6 +21,7 @@ describe('TerminalRenderer render big', () => {
 	it('should not throw with options param', () => {
 		expect(() => {
 			str = TerminalRenderer.render(sampleQrData, {
+				type: 'terminal',
 				margin: 10,
 				scale: 1,
 			});
@@ -34,7 +34,7 @@ describe('TerminalRenderer render big', () => {
 
 	it('should not throw with inverse options', () => {
 		expect(() => {
-			str = TerminalRenderer.render(sampleQrData, { inverse: true });
+			str = TerminalRenderer.render(sampleQrData, { type: 'terminal', inverse: true });
 		}).not.toThrow();
 	});
 
@@ -44,7 +44,6 @@ describe('TerminalRenderer render big', () => {
 });
 
 describe('TerminalRenderer render small', () => {
-	// @ts-ignore
 	const sampleQrData = QRCode.create('sample text', { version: 2 });
 	let str: string | undefined;
 	const callback = jest.fn();
@@ -58,6 +57,7 @@ describe('TerminalRenderer render small', () => {
 	it('should not throw with options param and without callback', () => {
 		expect(() => {
 			str = TerminalRenderer.render(sampleQrData, {
+				type: 'terminal',
 				margin: 10,
 				scale: 1,
 				small: true,
@@ -70,6 +70,7 @@ describe('TerminalRenderer render small', () => {
 			str = TerminalRenderer.render(
 				sampleQrData,
 				{
+					type: 'terminal',
 					margin: 10,
 					scale: 1,
 					small: true,
@@ -89,7 +90,7 @@ describe('TerminalRenderer render small', () => {
 
 	it('should not throw with inverse options', () => {
 		expect(() => {
-			str = TerminalRenderer.render(sampleQrData, { small: true, inverse: true });
+			str = TerminalRenderer.render(sampleQrData, { type: 'terminal', small: true, inverse: true });
 		}).not.toThrow();
 	});
 
