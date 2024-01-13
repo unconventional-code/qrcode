@@ -1,4 +1,3 @@
-// @ts-nocheck
 import fs from 'fs';
 
 import { QRCode } from '../core/qrcode';
@@ -80,14 +79,13 @@ export function render(
 export function renderToFile(
 	path: string,
 	qrData: QRCode,
-	options?: Utils.QRCodeOptionsInput | ((error: Error) => void),
-	cb?: (error: Error) => void
+	optionsOrCb?: Utils.QRCodeOptionsInput | ((error: Error | null) => void),
+	cb?: (error: Error | null) => void
 ) {
-	if (typeof cb === 'undefined') {
-		cb = options;
-		options = undefined;
-	}
+	const actualOptions = typeof optionsOrCb === 'object' ? optionsOrCb : {};
+	const actualCb =
+		typeof cb === 'function' ? cb : typeof optionsOrCb === 'function' ? optionsOrCb : () => {};
 
-	const utf8 = render(qrData, options);
-	fs.writeFile(path, utf8, cb);
+	const utf8 = render(qrData, actualOptions);
+	fs.writeFile(path, utf8, actualCb);
 }
