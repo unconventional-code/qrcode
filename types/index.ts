@@ -1,14 +1,14 @@
 import * as stream from 'stream';
-import {
-	ErrorCorrectionLevel,
-	QRCodeErrorCorrectionLevel,
-} from '../lib/core/error-correction-level';
-import { Mode } from '../lib/core/mode';
-import { QRCodeMaskPattern } from '../lib/core/mask-pattern';
-import BitMatrix from '../lib/core/bit-matrix';
 import { QRCodeSegment } from '../lib/core/segments';
-import { QRCodeOptions } from '../lib/core/qrcode';
-import { QRCodeRenderersOptions } from '../lib/renderer/utils';
+import { QRCode, QRCodeOptions } from '../lib/core/qrcode';
+import {
+	QRCodeRenderersOptions,
+	QRCodeToBufferOptions,
+	QRCodeToDataURLOptions,
+	QRCodeToFileOptions,
+	QRCodeToFileStreamOptions,
+	QRCodeToStringOptions,
+} from '../lib/renderer/utils';
 
 /**
  * Creates QR Code symbol and returns a qrcode object.
