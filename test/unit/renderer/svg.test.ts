@@ -1,4 +1,3 @@
-// @ts-nocheck
 import fs from 'fs';
 import * as htmlparser from 'htmlparser2';
 import * as QRCode from '../../../lib/core/qrcode';

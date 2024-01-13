@@ -76,7 +76,7 @@ function qrToPath(data: Uint8Array, size: number, margin: number) {
 
 export function render(
 	qrData: QRCode,
-	options: Utils.QRCodeOptionsInput,
+	options?: Utils.QRCodeOptionsInput,
 	cb?: (error: Error | null | undefined, string: string) => void
 ) {
 	const opts = Utils.getOptions(options);

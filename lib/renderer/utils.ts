@@ -220,9 +220,13 @@ export type QRCodeOptionsOutput = Omit<QRCodeOptionsInput, 'color'> & {
 		| QRCodeToBufferOptions['rendererOpts']
 		| {};
 };
-export function getOptions(options: QRCodeOptionsInput): QRCodeOptionsOutput {
-	if (!options) options = {};
-	if (!options.color) options.color = {};
+export function getOptions(options?: QRCodeOptionsInput): QRCodeOptionsOutput {
+	if (!options) {
+		options = {};
+	}
+	if (!options.color) {
+		options.color = {};
+	}
 
 	const margin =
 		typeof options.margin === 'undefined' || options.margin === null || options.margin < 0
