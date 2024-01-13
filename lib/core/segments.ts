@@ -298,9 +298,9 @@ function buildSingleSegment(
 				data +
 				'"' +
 				' cannot be encoded with mode ' +
-				Mode.toString(mode) +
+				mode.id +
 				'.\n Suggested mode is: ' +
-				Mode.toString(bestMode)
+				bestMode.id
 		);
 	}
 

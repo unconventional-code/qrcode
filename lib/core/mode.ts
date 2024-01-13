@@ -132,19 +132,6 @@ export function getBestModeForData(dataStr: string | StructuredAppendDataPayload
 }
 
 /**
- * Return mode name as string
- *
- * @param {Mode} mode Mode object
- * @returns {String}  Mode name
- */
-export function toString(mode: Mode) {
-	if (mode && mode.id) {
-		return mode.id;
-	}
-	throw new Error('Invalid mode');
-}
-
-/**
  * Get mode object from its name
  *
  * @param   {String} string Mode name

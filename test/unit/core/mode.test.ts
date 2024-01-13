@@ -124,18 +124,4 @@ describe('Mode', () => {
 			expect(Mode.from(null as unknown as Mode.ModeId, 'Numeric')).toEqual(Mode.NUMERIC);
 		});
 	});
-
-	describe('To string', () => {
-		it('should return mode name', () => {
-			expect(Mode.toString(Mode.NUMERIC)).toEqual('Numeric');
-			expect(Mode.toString(Mode.ALPHANUMERIC)).toEqual('Alphanumeric');
-			expect(Mode.toString(Mode.BYTE)).toEqual('Byte');
-			expect(Mode.toString(Mode.KANJI)).toEqual('Kanji');
-			expect(Mode.toString(Mode.STRUCTURED_APPEND)).toEqual('StructuredAppend');
-		});
-
-		it('should throw if mode is invalid', () => {
-			expect(() => Mode.toString({} as Mode.Mode)).toThrow();
-		});
-	});
 });
